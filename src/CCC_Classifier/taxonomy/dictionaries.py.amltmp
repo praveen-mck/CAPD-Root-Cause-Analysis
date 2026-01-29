@@ -1,0 +1,622 @@
+
+# -*- coding: utf-8 -*-
+"""
+Canonical taxonomy dictionaries for CCC classifier.
+
+Design choices (as requested):
+- Keep "No Customer Input"
+- Remove:
+  - "Unclassified Domain"
+  - "Unclassified Subdomain"
+  - "Unclassified Cause"
+  - "Unclassified Driver"
+- Anything outside canonical labels should be handled as: "Other: <free text>"
+  (implemented in taxonomy/canon.py and pipeline stages, not here).
+"""
+
+from __future__ import annotations
+
+from typing import Dict, List
+
+EXPECTED_KEYS_ORDER: List[str] = [
+    "contact_type",
+    "domain",
+    "subdomain",
+    "root_cause",
+    "contact_driver",
+    "case_context",
+    "confidence",
+]
+
+# -------------------------
+# Contact Types (canonical)
+# -------------------------
+CONTACT_TYPES_CANON: List[str] = ["Issue", "Inquiry", "Request", "Unclear Contact"]
+
+# -------------------------
+# Domains (canonical)
+# NOTE: "Unclassified Domain" removed by request.
+# -------------------------
+DOMAINS_CANON: List[str] = [
+    "Product",
+    "Billing",
+    "Order & Fulfillment",
+    "Returns",
+    "Technical Support",
+    "Programs & Rewards",
+    "Case Management",
+    "Portal Guidance",
+    "Policy & Compliance",
+    "No Customer Input",
+    "Customer Feedback",
+]
+
+# --------------------------------
+# Subdomains per Domain (canonical)
+# NOTE: "Unclassified Subdomain" removed from every domain by request.
+# NOTE: Entire "Unclassified Domain" key removed by request.
+# --------------------------------
+
+
+
+
+SUBDOMAINS_BY_DOMAIN_CANON: Dict[str, List[str]] = {
+    "Product": [
+        "Product Availability",
+        "Product Expiry Information",
+        "Product Details & Specifications",
+        "Product Quality Issue",
+        "Product Recall",
+    ],
+    "Billing": [
+        "Invoice Request",
+        "Invoice Discrepancy",
+        "Account Hold / AR Hold",
+        "Pricing & Quotes",
+        "Credits & Adjustments",
+        "Reports & Statements",
+        "Payment Assistance",
+        "Invoice code meanings",
+    ],
+    "Order & Fulfillment": [
+        "Order Placement",
+        "Order Status",
+        "Delivery Status / ETA",
+        "Shipment Shortage",
+        "Incorrect Shipment Item",
+        "Delivery Documentation",
+        "Order cancellation",
+        "Order modification",
+        "Delivery closure notice",
+        "Packaging return policy",
+        "Holiday closure notice",
+        "Delivery schedule update",
+        "Delivery hold request",
+        "Delivery equipment issue",
+        "Order modification request",
+        "Cancel line item",
+    ],
+    "Returns": [
+        "Return Eligibility",
+        "Return Authorization (RMA)",
+        "Return Documentation",
+        "Return Status",
+        "Return Defect",
+        "Return packaging",
+        "Return packaging instructions",
+    ],
+    "Technical Support": [
+        "Authentication Issue",
+        "Portal Error",
+        "System Outage",
+        "Account Administration",
+        "Invoice reupload",
+    ],
+    "Programs & Rewards": [
+        "Publicly Funded Campaign Info",
+        "Rewards Cards Request",
+        "Rebate Information",
+        "Promotion code issue",
+    ],
+    "Case Management": [
+        "Callback Request",
+        "Case Status Update",
+        "Case Closure Request",
+        "Reconnect with Agent",
+        "Contact Information Request",
+        "Account merge request",
+        "Account access change",
+        "Temporary closure notice",
+        "Submit proof of delivery",
+    ],
+    "Portal Guidance": [
+        "Portal How-To",
+        "Portal Information",
+    ],
+    "Policy & Compliance": [
+        "Regulatory Documentation",
+        "Service Closures & Notices",
+        "Controlled substance return policy",
+        "Access removal request",
+    ],
+    "Customer Feedback": [
+        "Appreciation",
+    ],
+    "No Customer Input": [
+        "No Customer Input",
+    ],
+}
+
+
+
+
+# -------------------------------------
+# Root causes per Subdomain (canonical)
+# NOTE: "Unclassified Cause" removed by request.
+# NOTE: Entire "Unclassified Subdomain" key removed by request.
+# -------------------------------------
+
+ROOT_CAUSES_BY_SUBDOMAIN_CANON: Dict[str, List[str]] = {
+    "Product Availability": [
+        "Product out of stock",
+        "Manufacturer supply disruption",
+        "Allocation restriction applied",
+        "Inventory status not updated",
+        "Item discontinued or unavailable",
+        "Availability Inquiry",
+    ],
+    "Product Expiry Information": [
+        "Expiry date requested",
+        "Shortdated product concern",
+        "Need longerdated inventory",
+        "Shelf life clarification needed",
+        "Lot number requested",
+    ],
+    "Product Details & Specifications": [
+        "Product details unclear",
+        "Packaging size confusion",
+        "Alternative product requested",
+        "Equivalent item needed",
+        "Catalog search difficulty",
+    ],
+    "Product Quality Issue": [
+        "Product arrived damaged",
+        "Seal or packaging broken",
+        "Defective product reported",
+        "Temperature compromised product",
+        "Quality concern reported",
+    ],
+    "Product Recall": [
+        "Recall notice needs clarification",
+        "Recall return required",
+        "Recall status confirmation needed",
+    ],
+    "Invoice Request": [
+        "Missing invoice copy",
+        "Past invoice copy needed",
+        "Invoice reprint requested",
+        "Billing statement copy needed",
+        "Invoice download issue",
+        "Invoice Not Created Yet",
+        "Invoice number lookup",
+    ],
+    "Invoice Discrepancy": [
+        "Incorrect billed price",
+        "Wrong quantity billed",
+        "Tax calculation error",
+        "Unexpected fees applied",
+        "Duplicate charge billed",
+        "Billed item not received",
+        "Incorrect pharmacist name on invoice",
+        "Rebilling due to date error",
+    ],
+    "Account Hold / AR Hold": [
+        "Account on credit hold due to outstanding balance",
+        "AR hold preventing order submission",
+        "Payment past due (ordering blocked)",
+    ],
+    "Order Placement": [
+        "Order entry difficulty",
+        "Order submission failed",
+        "Item not orderable",
+        "Cutoff exception needed",
+        "No order confirmation",
+        "Cutoff time inquiry",
+        "Auto-substitution settings inquiry",
+        "Unwanted auto order from banner promo",
+        "Pickup not available in region",
+        "No access to saturday delivery",
+        "Auto substitution not configurable per item",
+        "Unclear item addition source",
+        "Cancel request after billing",
+        "Ordering eligibility for covid vaccine",
+    ],
+    "Order Status": [
+        "Order not confirmed",
+        "Order stuck in processing",
+        "Awaiting shipping confirmation",
+        "Order processing delay",
+        "Missing shipment documentation",
+        "Order ETA inquiry",
+        "Order ETA requested",
+        "Order ETA update requested",
+        "Order ETA not available",
+        "Order unlock needed",
+        "Order date inquiry",
+        "Order auto-closed after early picking drop",
+        "Icon meaning on order",
+        "Unrecognized shipment received",
+        "Delete locked transaction",
+        "Cannot cancel order sent to dc",
+        "Unable to delete blank order",
+        "Canceled order shipped",
+        "Warehouse out of stock for items",
+        "Unrequested order received",
+        "Prebook fulfillment inquiry",
+        "Cancel same-day delivery request",
+        "Expedite after cutoff request",
+    ],
+    "Delivery Status / ETA": [
+        "Delivery running late",
+        "Tracking not updating",
+        "Carrier delay reported",
+        "Delivered not received",
+        "Proof of delivery requested",
+        "Tracking number requested",
+        "Missing shipment documentation",
+        "Delivery ETA inquiry",
+        "Delivery Not Scheduled",
+        "Delivery Attempt Missed",
+        "Delivery hold request",
+        "Location closed on specific date",
+        "Driver contact info requested",
+    ],
+    "Shipment Shortage": [
+        "Missing items in shipment",
+        "Shorted quantity received",
+        "Missing tote or package",
+        "Partial shipment received",
+        "Item found after reported shortage",
+    ],
+    "Incorrect Shipment Item": [
+        "Wrong item shipped",
+        "Wrong SKU received",
+        "Unexpected substitution received",
+        "Unexpected extra item received",
+        "Wrong quantity shipped",
+    ],
+    "Delivery Documentation": [
+        # this is repeated in multiple places - need to check which is the appropriate place and remove from other subdomains
+        "Missing shipment documentation",
+        "Missing packing slip",
+        "Proof of delivery needed",
+        "Invoice number lookup",
+        "Incorrect tote labeling",
+        "Confirmation of no delivery requested",
+        # check this
+        "Stop OTC price stickers",
+    ],
+    "Return Eligibility": [
+        "Unsure item is returnable",
+        "Policy window unclear",
+        "Return policy clarification needed",
+        "Requesting return for overstock",
+    ],
+    "Return Authorization (RMA)": [
+        "RMA approval needed",
+        "Return authorization requested",
+        "Return pickup request pending",
+        "Return already created",
+        "Cancel RMA",
+        "Cancel approved return",
+        "Lot number mismatch in authorization",
+        "Return cancellation needed",
+    ],
+    "Return Documentation": [
+        "Missing return label",
+        "Return paperwork not received",
+        "Return form required",
+        "Missing lot and expiry details",
+        "Return reason code guidance",
+        "Invoice number lookup",
+        "Incorrect quantity on return",
+        "Item not on return form",
+        "Missing invoice",
+        "Return bag too small",
+        "Return quantity clarification",
+        "Incorrect return paperwork",
+        "Incorrect return quantity entry",
+        "Return address needed",
+        "Missing cytotoxic return bag",
+        "Return calculation clarification",
+        "Access past return records",
+        "Partial quantity entry format error",
+        "Packaging instructions for return",
+        "Damaged return bag",
+        "Incorrect invoice number for return",
+        "Wrong item number provided",
+        "Driver refused due to packaging",
+        "Clarification on return codes / units"
+    ],
+    "Return Status": [
+        "Return not received yet",
+        "Return processing delayed",
+        "Credit not processed yet",
+        "Return window expiration due to internal delay",
+        "Return window expired",
+        # can be removed from here and kept only in return authorization
+        "Return cancellation needed",
+        "Return canceled due to late receipt",
+        "Return kit not received",
+        "Return status inquiry",
+        "Credit posted checking wrong section",
+        "Return request denied by vendor",
+        "Credit amount dispute",
+        # can be removed from here and kept only in return authorization
+        "Return already created",
+        "Return initiation incomplete",
+    ],
+    "Return Defect": [
+        "Expired product received",
+        "Defective product delivered",
+        "Damaged product received",
+    ],
+    "Authentication Issue": [
+        "Login credentials failing",
+        "Account access blocked",
+        "Password reset required",
+        "MFA or SSO issue",
+        "Authentication/Access Support",
+    ],
+    "Portal Error": [
+        "Checkout error encountered",
+        "Page not loading",
+        "Search function failing",
+        "Order submission error",
+        "Label printing error",
+        "Invoice visibility error",
+        "Incorrect document status in portal",
+        "Promotion not found error",
+    ],
+    "System Outage": [
+        "System temporarily down",
+        "Service unavailable today",
+        "Portal unavailable for all",
+    ],
+    "Account Administration": [
+        "User profile/account management",
+    ],
+    "Regulatory Documentation": [
+        "License documentation required",
+        "Regulatory form required",
+        "Program eligibility unclear",
+        "Audit documents requested",
+        "Recall acknowledgement change request",
+        "Recall response correction",
+        "Wholesale recall not communicated to pharmacies",
+        "Return policy for expired narcotics",
+    ],
+    "Credits & Adjustments": [
+        "Credit status inquiry",
+        "Request copy of credit memo",
+        "Partial credit issued for return",
+        "Credit pending processing",
+        "Unable to locate credit",
+        "Credit history report request",
+        "Credit for missing item",
+        "Damaged product received",
+        "Billed for unreceived item",
+        "Missing credit notes",
+        "Refund status inquiry for defective product",
+        "Cancel credit after item found",
+        "Credit request outside time window",
+        "Credit pending item not received at warehouse",
+        "Credit delayed pending dc information",
+        "Missing items refund follow-up",
+        "Missing item from shipment",
+        "Item not returned",
+        "Return credit not processed",
+        "Partial credit due to received quantity",
+        "Spoiled fridge items from missed delivery",
+    ],
+    "Reports & Statements": [
+        "Request for historical order quantity report",
+        "Needs monthly sales tax summary",
+        "Needs invoice history for item",
+        "Portal lacks comprehensive purchase history",
+        "Limited history in return management",
+        "Needs period total spend report",
+        "Needs credit history report",
+    ],
+    "Portal How-To": [
+        "How to place backorder in portal",
+        "How to order promo item",
+        "How to find order date for item",
+        "Wrong account selected",
+        "Cannot add pharmacist users via portal",
+        "How to print item/date report",
+        "Prevent item substitution during checkout",
+        "Delete unsubmitted order",
+        "Find rfc in portal",
+        "Needed to scroll dropdown menu",
+        "How to request credit for missing item",
+        "Find who ordered specific items",
+        "Portal claims submission guidance",
+        "Feature not available in portal",
+        "Add pharmacist user with same email",
+        "How to access narcotics report",
+        "How to add non-pharmacist user",
+        "How to disable order substitutions",
+        "New pharmaclick login for pharmacy manager",
+        "Wrong claim type selected",
+        "Cannot find claims submission option",
+        "Add new pharmacist user",
+        "Add new pharmacist user process",
+        "How to print price stickers",
+        "How to filter closed narcotic orders",
+        "Create new portal account",
+        "Remove location from portal account",
+    ],
+    "Portal Information": [
+        "Medis ord file format help",
+        "Ordering access permissions",
+        "No narcotics filter option",
+        "New portal account setup",
+        "Disable auto substitution per DIN",
+    ],
+    "Publicly Funded Campaign Info": [
+        "Needs info on publicly funded fall campaign",
+        "Enrollment approval delay for naloxone program",
+        "Covid vaccine availability inquiry",
+        "Ahs naloxone program registration",
+        "Registration confirmation pending",
+        "Pharmacy eligibility for private covid-19 program",
+        "No update for publicly funded vaccines",
+        "Exception order availability inquiry",
+        "Allocation details and ahs requirements",
+        "Flu shot update not available yet",
+    ],
+    "Rewards Cards Request": [
+        "Request rewards cards with existing order",
+    ],
+    "Rebate Information": [
+        "Needs program rebate rate details",
+    ],
+    "Pricing & Quotes": [
+        "Payer reimbursement mismatch",
+        "Product price inquiry",
+        "Retail vs unit price confusion",
+        "Historical pricing for subsidized product",
+    ],
+    "Payment Assistance": [
+        "Payments not supported via chat",
+    ],
+    "Callback Request": [
+        "Agent cannot make outbound calls",
+    ],
+    "Case Status Update": [
+        "Case status update needed",
+        "Confirming receipt of emailed POD",
+        "Claim still processing",
+        "Delivery time change unavailable due to routing",
+        "Pharmaclik account setup delay",
+        "Verify claim submission and case number",
+    ],
+    "Case Closure Request": [
+        "Item received close claim",
+        "Customer resolved internal miscommunication",
+    ],
+    "Reconnect with Agent": [
+        "Agent callback number disconnected",
+        "Requested reconnect with previous agent",
+        "Disconnected chat wants previous agent",
+    ],
+    "Contact Information Request": [
+        "Requested support phone number",
+    ],
+    "Service Closures & Notices": [
+        "Government policy change on vaccine distribution",
+        "Scheduled closure notice",
+        "Location closed on specific date",
+        "Recall notice inquiry",
+        "Request shipping memo email",
+    ],
+    "Appreciation": [
+        "Thanking erin for expedited order",
+    ],
+    # need to check if we want to remove this subdomain and merge it with maybe order status.
+    "Order cancellation": [
+        "Order cancellation needed",
+    ],
+    "Invoice code meanings": [
+        "Missing invoice code legend",
+    ],
+    "Return packaging": [
+        "Specialty return bag needed (cytotoxic)",
+        "Return bag size issue",
+        "Damaged return bag"
+    ],
+    
+    "Return packaging instructions": [
+        "Return packaging clarification",
+    ],
+    "Submit proof of delivery": [
+        "Needs instructions to submit POD",
+    ],
+    "Controlled substance return policy": [
+        "Accidental return of controlled substances",
+    ],
+    "Holiday closure notice": [
+        "Location closed on specific date",
+    ],
+    "Order modification request": [
+        "Order modification not possible",
+    ],
+    "Cancel line item": [
+        "Patient changed mind",
+        "Cancel without reason"
+    ],
+    "Promotion code issue": [
+        "Promo not set up in system",
+    ],
+    "Delivery schedule update": [
+        "Schedule update request not actioned",
+    ],
+    "Temporary closure notice": [
+        "Location closed on specific date",
+    ],
+    "Account merge request": [
+        "Merge accounts to one email",
+    ],
+    "Delivery equipment issue": [
+        "No liftgate or pallet jack on truck",
+        #also comes in Delivery documentation - need to decide one place
+        "Incorrect tote labeling",
+    ],
+    "Account access change": [
+        "Narcotic access form required",
+        "Remove location from account",
+    ],
+    "Invoice reupload": [
+        "Invoices failed to load in pos",
+    ],
+    "Access removal request": [
+        "Remove narcotic signer role",
+    ],
+    "Delivery hold request": [
+        "Location closed on specific date",
+    ],
+    "Delivery closure notice": [
+        "Location closed on specific date",
+    ],
+    "No Customer Input": [
+        "No Customer Input",
+    ],
+}
+
+
+# ------------------------------
+# Contact Drivers (canonical)
+# NOTE: "Unclassified Driver" removed by request.
+# ------------------------------
+CONTACT_DRIVERS_CANON: List[str] = [
+    "Saw Recall / Regulatory Notice",
+    "Saw Supplier / Manufacturer Message",
+    "Saw Alert in Another System",
+    "Saw Portal Message / Banner",
+    "Saw Portal Error / Malfunction",
+    "Saw Unexpected Status Change",
+    "Saw No Progress",
+    "Saw Carrier Update / Exception",
+    "Saw Delivered but Not Received",
+    "Saw Item / Quantity Mismatch",
+    "Saw Price / Charge Difference",
+    "Saw Missing Document",
+    "Saw Missing Confirmation",
+    "Saw Unclear Information",
+    "Urgent / TimeSensitive Need",
+    "Was Unfamiliar with Next Step",
+    "Needed Account / User Change",
+    "Wanted to Provide Feedback",
+    "No Customer Input",
+]

@@ -1,0 +1,244 @@
+
+"""
+scripts/main.py
+
+Thin terminal entrypoint for CCC classifier.
+- Reads transcripts from Snowflake
+- Runs async batch classifier (Azure OpenAI)
+- Writes results to Snowflake (stage -> merge -> drop stage)
+
+Run:
+  python scripts/main.py
+
+Optional environment variables (same spirit as your original script):
+  SOURCE_DB, SOURCE_SCHEMA, SOURCE_TABLE
+  RESULT_DB, RESULT_SCHEMA, RESULT_TABLE
+  ID_COL, TEXT_COL, WHERE_CLAUSE, MAX_ROWS
+  MAX_CONCURRENT, MAX_COMPLETION_TOKENS, USE_JSON_MODE
+
+  SF_USER, SF_URL, SF_WAREHOUSE, SF_ROLE
+  SF_RSA_KEY_SECRET, SF_PEM_PASSPHRASE_SECRET, SF_KEYVAULT_NAME
+  AZURE_OPENAI_API_KEY, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT_NAME
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import os
+import sys
+import time
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
+from openai import AsyncAzureOpenAI
+
+
+# ----------------------------
+# Make src/ importable
+# ----------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # scripts/main.py -> project root
+SRC_PATH = PROJECT_ROOT / "src"
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+
+
+# ----------------------------
+# Imports from your refactored package
+# ----------------------------
+from CCC_Classifier.pipeline.batch import process_batch  # async batch runner
+from CCC_Classifier.io.snowflake import (
+    extract_data_from_snowflake,
+    execute_snowflake_multi_query,
+    write_pandas_create_or_replace_stage,
+    merge_results_into_table,
+)
+
+
+def _env(name: str, default: str | None = None, required: bool = False) -> str:
+    v = os.getenv(name, default)
+    if required and not v:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return v or ""
+
+
+def _int_env(name: str, default: int) -> int:
+    try:
+        return int(os.getenv(name, str(default)))
+    except Exception:
+        return default
+
+
+def _bool_env(name: str, default: bool) -> bool:
+    raw = os.getenv(name, str(default)).strip().lower()
+    return raw in ("1", "true", "t", "yes", "y")
+
+
+async def main() -> None:
+    # ----------------------------
+    # Job parameters (same as your original)
+    # ----------------------------
+    SOURCE_DB = _env("SOURCE_DB", "DEV_MT_BIG_BETS_DB")
+    SOURCE_SCHEMA = _env("SOURCE_SCHEMA", "POC")
+    SOURCE_TABLE = _env("SOURCE_TABLE", "CHAT_TRANSCRIPTS_JULY_TO_SEPT_2025_V2")
+    # CHAT_TRANSCRIPTS_JULY_TO_SEPT_2025_V2_OTHERS (Testing)
+    ID_COL = _env("ID_COL", "CHAT_TRANSCRIPT_NAME")
+    TEXT_COL = _env("TEXT_COL", "BODY")
+
+    RESULT_DB = _env("RESULT_DB", SOURCE_DB)
+    RESULT_SCHEMA = _env("RESULT_SCHEMA", SOURCE_SCHEMA)
+    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD")
+
+    WHERE_CLAUSE = _env("WHERE_CLAUSE", "WHERE BODY IS NOT NULL")
+    MAX_ROWS = _int_env("MAX_ROWS", 20)
+
+    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 256)
+    USE_JSON_MODE = _bool_env("USE_JSON_MODE", True)
+
+    # ----------------------------
+    # Snowflake config (Key Vault + key-pair auth)
+    # ----------------------------
+    sf_cfg: Dict[str, Any] = {
+        "sf_user": _env("SF_USER", "DEV_MT_BIGBETS_AU"),
+        "sf_url": _env("SF_URL", required=True),
+        "database": SOURCE_DB,
+        "schema": SOURCE_SCHEMA,
+        "warehouse": _env("SF_WAREHOUSE", "DEV_MT_BIG_BETS_WH"),
+        "role": _env("SF_ROLE", "DEV_MT_BIG_BETS_ENGINEER_FR"),
+        "rsa_key_secret_name": _env("SF_RSA_KEY_SECRET", "bigbets-dev-snowflake-rsakey"),
+        "pem_passphrase_secret_name": _env("SF_PEM_PASSPHRASE_SECRET", "bigbets-dev-snowflake-pem-passphrase"),
+        "keyvault_name": _env("SF_KEYVAULT_NAME", "kv-mlops-aibigbets-dev"),
+    }
+
+    # ----------------------------
+    # Azure OpenAI (required)
+    # ----------------------------
+    _env("AZURE_OPENAI_API_KEY", required=True)
+    _env("AZURE_OPENAI_API_VERSION", required=True)
+    _env("AZURE_OPENAI_ENDPOINT", required=True)
+    deployment = _env("AZURE_OPENAI_DEPLOYMENT_NAME", required=True)
+
+    client = AsyncAzureOpenAI(
+        api_key=_env("AZURE_OPENAI_API_KEY"),
+        api_version=_env("AZURE_OPENAI_API_VERSION"),
+        azure_endpoint=_env("AZURE_OPENAI_ENDPOINT"),
+    )
+
+    # ----------------------------
+    # Read inputs from Snowflake
+    # ----------------------------
+    where = f" {WHERE_CLAUSE}" if WHERE_CLAUSE.strip() else ""
+    select_sql = f"""
+    SELECT {ID_COL}, {TEXT_COL}
+    FROM {SOURCE_DB}.{SOURCE_SCHEMA}.{SOURCE_TABLE}
+    {where}
+    LIMIT {MAX_ROWS};
+    """
+
+    print(f"\n[main] Reading input rows from Snowflake:\n{select_sql.strip()}")
+    t0 = time.perf_counter()
+    src_df = extract_data_from_snowflake(sf_cfg, select_sql)
+    print(f"[main] Loaded {len(src_df)} rows in {round(time.perf_counter() - t0, 2)}s")
+
+    if src_df.empty:
+        print("[main] No rows to process. Exiting.")
+        return
+
+    # ----------------------------
+    # Run batch classification (async)
+    # process_batch should do:
+    # - concurrency
+    # - call analyze_transcript for each row
+    # - return DataFrame with output columns
+    # ----------------------------
+    rows = src_df.to_dict(orient="records")
+
+    print(
+        f"\n[main] Classifying {len(rows)} transcripts "
+        f"(deployment={deployment}, max_tokens={MAX_COMPLETION_TOKENS}, json_mode={USE_JSON_MODE})"
+    )
+
+    t1 = time.perf_counter()
+    results_df = await process_batch(
+        client=client,
+        deployment=deployment,
+        rows=rows,
+        id_col=ID_COL,
+        text_col=TEXT_COL,
+        max_completion_tokens=MAX_COMPLETION_TOKENS,
+        use_json_mode=USE_JSON_MODE,
+    )
+    infer_s = time.perf_counter() - t1
+    print(f"[main] Inference done in {round(infer_s, 2)}s. Results rows: {len(results_df)}")
+
+    # Normalize timestamp field as string (Snowflake stage table creation in your helper may expect this)
+    if "ANALYZED_AT" in results_df.columns:
+        results_df["ANALYZED_AT"] = pd.to_datetime(results_df["ANALYZED_AT"], errors="coerce").dt.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+    # ----------------------------
+    # Write stage + merge into target + cleanup stage
+    # ----------------------------
+    temp_table = f"{RESULT_TABLE}_STAGE"
+
+    # Use RESULT_DB/SCHEMA for writing results
+    out_cfg = dict(sf_cfg)
+    out_cfg["database"] = RESULT_DB
+    out_cfg["schema"] = RESULT_SCHEMA
+
+    print(f"\n[main] Writing stage table: {RESULT_DB}.{RESULT_SCHEMA}.{temp_table}")
+    t2 = time.perf_counter()
+    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, results_df, temp_table)
+    print(
+        f"[main] Stage write: success={success}, chunks={nchunks}, rows={nrows} "
+        f"in {round(time.perf_counter() - t2, 2)}s"
+    )
+
+    # Ensure target table exists (keep it basic; add columns you need)
+    create_target_sql = f"""
+    CREATE TABLE IF NOT EXISTS "{RESULT_DB}"."{RESULT_SCHEMA}"."{RESULT_TABLE}" (
+      "CHAT_TRANSCRIPT_NAME" STRING,
+      "CONTACT_TYPE" STRING,
+      "DOMAIN" STRING,
+      "SUBDOMAIN" STRING,
+      "ROOT_CAUSE" STRING,
+      "CONTACT_DRIVER" STRING,
+      "CASE_CONTEXT" STRING,
+      "CONFIDENCE" FLOAT,
+      "ANALYZED_AT" TIMESTAMP_NTZ,
+      "IS_NO_INPUT" NUMBER(1,0)
+    );
+    """
+    execute_snowflake_multi_query(out_cfg, create_target_sql)
+
+    print(f"[main] Merging stage -> target: {RESULT_DB}.{RESULT_SCHEMA}.{RESULT_TABLE}")
+    merge_results_into_table(
+        cfg=out_cfg,
+        target_table=RESULT_TABLE,
+        stage_table=temp_table,
+        id_col="CHAT_TRANSCRIPT_NAME",  # keep this consistent with your pipeline output
+    )
+
+    print("[main] Dropping stage table...")
+    drop_sql = f'DROP TABLE IF EXISTS "{RESULT_DB}"."{RESULT_SCHEMA}"."{temp_table}";'
+    execute_snowflake_multi_query(out_cfg, drop_sql)
+
+    # ----------------------------
+    # Print simple metrics
+    # ----------------------------
+    metrics = {
+        "records_processed": int(len(results_df)),
+        "inference_seconds": round(infer_s, 2),
+        "stage_rows": int(nrows),
+        "deployment": deployment,
+        "max_completion_tokens": MAX_COMPLETION_TOKENS,
+        "use_json_mode": USE_JSON_MODE,
+    }
+    print("\n=== Batch Metrics ===")
+    print(json.dumps(metrics, indent=2))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
