@@ -185,7 +185,7 @@ def system_prompt_contact_driver() -> str:
 
 
 
-def system_prompt_case_context() -> str:
+def system_prompt_SHORT_SUMMARY() -> str:
     return (
         "You are an expert summarizer for customer support transcripts.\n"
         "Task: Write a single short sentence describing THIS case (object + issue/ask).\n"
@@ -193,6 +193,6 @@ def system_prompt_case_context() -> str:
         "- One sentence only.\n"
         "- Active voice, factual, no speculation.\n"
         "- Do not include PII.\n"
-        + _json_rule_block("case_context")
+        + _json_rule_block("SHORT_SUMMARY")
     )
 

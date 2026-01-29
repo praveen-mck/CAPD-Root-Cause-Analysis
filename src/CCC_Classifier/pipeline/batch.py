@@ -59,7 +59,7 @@ async def process_batch(
     Returns:
         DataFrame with columns:
           CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE,
-          CONTACT_DRIVER, CASE_CONTEXT, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
+          CONTACT_DRIVER, SHORT_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
           optional: _DURATION_MS
     """
     max_concurrent = _int_env("MAX_CONCURRENT", 8)
@@ -89,7 +89,7 @@ async def process_batch(
                     "subdomain": "Other: Unspecified",
                     "root_cause": "Other: Unspecified",
                     "contact_driver": "Other: Unspecified",
-                    "case_context": "Context Unspecified",
+                    "SHORT_SUMMARY": "Context Unspecified",
                     "confidence": 0.0,
                     "IS_NO_INPUT": 0,
                 }
@@ -104,7 +104,7 @@ async def process_batch(
                 "SUBDOMAIN": result.get("subdomain", "Other: Unspecified"),
                 "ROOT_CAUSE": result.get("root_cause", "Other: Unspecified"),
                 "CONTACT_DRIVER": result.get("contact_driver", "Other: Unspecified"),
-                "CASE_CONTEXT": result.get("case_context", "Context Unspecified"),
+                "SHORT_SUMMARY": result.get("SHORT_SUMMARY", "Context Unspecified"),
                 "CONFIDENCE": float(result.get("confidence", 0.0) or 0.0),
                 "ANALYZED_AT": dt.datetime.utcnow(),
                 "IS_NO_INPUT": int(result.get("IS_NO_INPUT", 0) or 0),

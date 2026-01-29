@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 from CCC_Classifier.llm.client import send_chat_request
 from CCC_Classifier.llm.parsing import clamp_conf, extract_content_and_usage, get_json_field, safe_parse_json
 from CCC_Classifier.pipeline.prompts import (
-    system_prompt_case_context,
+    system_prompt_SHORT_SUMMARY,
     system_prompt_contact_driver,
     system_prompt_contact_type,
     system_prompt_domain,
@@ -282,7 +282,7 @@ async def stage_contact_driver(
 
 
 
-async def stage_case_context(
+async def stage_SHORT_SUMMARY(
     *,
     client: Any,
     deployment: str,
@@ -290,7 +290,7 @@ async def stage_case_context(
     max_completion_tokens: int = 512,
     use_json_mode: bool = True,
 ) -> Dict[str, Any]:
-    sys_text = system_prompt_case_context()
+    sys_text = system_prompt_SHORT_SUMMARY()
     user_text = _user_transcript_block(transcript)
 
     resp = await send_chat_request(
@@ -312,7 +312,7 @@ async def stage_case_context(
     content, usage, finish = extract_content_and_usage(resp)
     data = safe_parse_json(content)
 
-    ctx = _as_str(get_json_field(data, "case_context", "")) or "Context Unspecified"
+    ctx = _as_str(get_json_field(data, "SHORT_SUMMARY", "")) or "Context Unspecified"
 
     # ---- Only print diagnostics when ctx is unspecified ----
     if ctx == "Context Unspecified":
@@ -332,12 +332,12 @@ async def stage_case_context(
         if not isinstance(data, dict) or not data:
             reasons.append("parsed_json=empty_or_invalid")
         else:
-            if "case_context" not in data:
-                reasons.append(f"missing_key=case_context (keys={list(data.keys())})")
+            if "SHORT_SUMMARY" not in data:
+                reasons.append(f"missing_key=SHORT_SUMMARY (keys={list(data.keys())})")
             else:
-                v = data.get("case_context")
+                v = data.get("SHORT_SUMMARY")
                 if v is None or (isinstance(v, str) and v.strip() == ""):
-                    reasons.append("case_context_value=empty_or_null")
+                    reasons.append("SHORT_SUMMARY_value=empty_or_null")
 
         # 4) Token usage insights (very useful for your earlier issue)
         try:
@@ -360,10 +360,10 @@ async def stage_case_context(
         except Exception:
             reasons.append("message_inspect_error")
 
-        print("\n[CASE_CONTEXT UNSPECIFIED] " + " | ".join(reasons))
+        print("\n[SHORT_SUMMARY UNSPECIFIED] " + " | ".join(reasons))
         # Optional: print raw content + parsed json for deep debugging
-        print("[CASE_CONTEXT UNSPECIFIED] raw_content:", repr(content))
-        print("[CASE_CONTEXT UNSPECIFIED] parsed_json:", data)
-        print("[CASE_CONTEXT UNSPECIFIED] usage:", usage)
+        print("[SHORT_SUMMARY UNSPECIFIED] raw_content:", repr(content))
+        print("[SHORT_SUMMARY UNSPECIFIED] parsed_json:", data)
+        print("[SHORT_SUMMARY UNSPECIFIED] usage:", usage)
 
-    return {"case_context": ctx, "_usage": usage, "_finish": finish}
+    return {"SHORT_SUMMARY": ctx, "_usage": usage, "_finish": finish}

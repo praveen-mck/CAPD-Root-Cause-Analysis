@@ -202,7 +202,7 @@ def system_prompt_contact_driver() -> str:
 
 
 
-def system_prompt_short_summary() -> str:
+def system_prompt_SHORT_SUMMARY() -> str:
     return (
         "You are an expert summarizer for customer support transcripts.\n"
         "Task: Write a concise summary describing the key context of this case.\n"
@@ -212,6 +212,6 @@ def system_prompt_short_summary() -> str:
         "- Use clear and simple language.\n"
         "- Avoid including any personal identifiable information (PII).\n"
         "- Do not include any speculation or assumptions.\n"
-        + _json_rule_block("short_summary")
+        + _json_rule_block("SHORT_SUMMARY")
     )
 

@@ -237,7 +237,7 @@ def merge_results_into_table(
 
     Assumes your stage dataframe uses uppercase column names as written by batch.py:
       CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER,
-      CASE_CONTEXT, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT
+      SHORT_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT
 
     Your scripts/main.py passes id_col="CHAT_TRANSCRIPT_NAME" (keep-as-is behavior).
     """
@@ -254,18 +254,18 @@ def merge_results_into_table(
       TGT."SUBDOMAIN"       = SRC."SUBDOMAIN",
       TGT."ROOT_CAUSE"      = SRC."ROOT_CAUSE",
       TGT."CONTACT_DRIVER"  = SRC."CONTACT_DRIVER",
-      TGT."CASE_CONTEXT"    = SRC."CASE_CONTEXT",
+      TGT."SHORT_SUMMARY"    = SRC."SHORT_SUMMARY",
       TGT."CONFIDENCE"      = SRC."CONFIDENCE",
       TGT."ANALYZED_AT"     = SRC."ANALYZED_AT",
       TGT."IS_NO_INPUT"     = SRC."IS_NO_INPUT"
     WHEN NOT MATCHED THEN INSERT (
       "{id_col}",
       "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN", "ROOT_CAUSE",
-      "CONTACT_DRIVER", "CASE_CONTEXT", "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
+      "CONTACT_DRIVER", "SHORT_SUMMARY", "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
     ) VALUES (
       SRC."{id_col}",
       SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN", SRC."ROOT_CAUSE",
-      SRC."CONTACT_DRIVER", SRC."CASE_CONTEXT", SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
+      SRC."CONTACT_DRIVER", SRC."SHORT_SUMMARY", SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
     );
     """
     print("[Snowflake] Merging stage -> target...\n", sql.strip())

@@ -24,7 +24,7 @@ EXPECTED_KEYS_ORDER: List[str] = [
     "subdomain",
     "root_cause",
     "contact_driver",
-    "case_context",
+    "SHORT_SUMMARY",
     "confidence",
 ]
 
