@@ -1,4 +1,4 @@
-Prototyoe Objective:
+Prototype Objective:
 Automate identification of why customers contact us via call interactions or chats, replacing a manual process with inconsistent/vague descriptions.
 
 In scope:
