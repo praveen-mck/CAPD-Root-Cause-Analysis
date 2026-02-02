@@ -25,6 +25,7 @@ EXPECTED_KEYS_ORDER: List[str] = [
     "root_cause",
     "contact_driver",
     "SHORT_SUMMARY",
+    "DETAILED_SUMMARY",
     "confidence",
 ]
 

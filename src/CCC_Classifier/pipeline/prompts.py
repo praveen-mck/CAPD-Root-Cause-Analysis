@@ -215,3 +215,41 @@ def system_prompt_SHORT_SUMMARY() -> str:
         + _json_rule_block("SHORT_SUMMARY")
     )
 
+
+def system_prompt_DETAILED_SUMMARY() -> str:
+    return (
+        "You are an expert summarizer for customer support transcripts.\n"
+        "Task: Write a high-level, structured summary capturing only the essential context of this case.\n"
+        "Rules:\n"
+        "- Output ONE paragraph containing EXACTLY these four labeled sentences in this order:\n"
+        " Key topics discussed: <one sentence>.\n"
+        " Important decisions made: <one sentence>.\n"
+        " Action items or next steps: <one sentence>.\n"
+        " Any unresolved questions or issues: <one sentence>.\n"
+        "- Each labeled sentence must be <= 15 words.\n"
+        "- Each sentence may describe only ONE primary idea.\n"
+        "- Base the summary ONLY on explicit statements in the transcript; do not infer or speculate.\n"
+        "- Mention the primary object (order, shipment, invoice, product, return, or account) only once.\n"
+        "- Focus on outcomes, not procedures or step-by-step actions.\n"
+        "- Avoid instructional or procedural language (e.g., fill out, navigate, submit via, count, click).\n"
+        "- Reduce content by selecting only the most important details; prefer omission over inclusion.\n"
+        "- If the interaction is a neutral inquiry, do not imply a failure or issue.\n"
+        "- Use clear, simple language.\n"
+        "- Avoid personal identifiable information (PII).\n"
+        "- If no unresolved issues remain, write exactly: \"None.\"\n"
+        "- If the transcript lacks sufficient information, set DETAILED_SUMMARY exactly to:\n"
+        "\"Insufficient information to generate a detailed summary.\"\n"
+        "\n"
+        "Example (valid JSON):\n"
+        "{\n"
+        " \"DETAILED_SUMMARY\": \"Key topics discussed: Return of recalled product without original packaging. "
+        "Important decisions made: Agent approved return under recall policy. "
+        "Action items or next steps: Customer to submit required return documentation. "
+        "Any unresolved questions or issues: None.\",\n"
+        " \"confidence\": 0.95\n"
+        "}\n"
+        + _json_rule_block("DETAILED_SUMMARY")
+    )
+
+
+

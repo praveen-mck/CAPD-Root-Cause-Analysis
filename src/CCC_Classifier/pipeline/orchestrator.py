@@ -18,11 +18,12 @@ Design choices (per your direction):
 """
 
 from __future__ import annotations
-
+import logging
 from typing import Any, Dict, Optional
 
 from CCC_Classifier.pipeline.stages import (
     stage_SHORT_SUMMARY,
+    stage_DETAILED_SUMMARY,
     stage_contact_driver,
     stage_contact_type,
     stage_domain,
@@ -31,6 +32,7 @@ from CCC_Classifier.pipeline.stages import (
 )
 from CCC_Classifier.utils.no_input import is_no_customer_input
 
+logger = logging.getLogger(__name__)
 
 def _min_conf(*vals: Optional[float]) -> float:
     """
@@ -58,6 +60,7 @@ def _no_input_result() -> Dict[str, Any]:
         "root_cause": "No Customer Input",
         "contact_driver": "No Customer Input",
         "SHORT_SUMMARY": "Customer did not provide sufficient input to agent.",
+        "DETAILED_SUMMARY": "Customer did not provide sufficient input to agent.",
         "confidence": 1.0,
         "IS_NO_INPUT": 1,
     }
@@ -75,7 +78,7 @@ async def analyze_transcript(
     Analyze a single transcript and return:
       {
         contact_type, domain, subdomain, root_cause,
-        contact_driver, SHORT_SUMMARY, confidence, IS_NO_INPUT
+        contact_driver, SHORT_SUMMARY, DETAILED_SUMMARY, confidence, IS_NO_INPUT
       }
 
     Notes:
@@ -150,14 +153,24 @@ async def analyze_transcript(
         contact_driver = drv.get("contact_driver", "")
         drv_conf = drv.get("confidence", 0.0)
 
-        ctx = await stage_SHORT_SUMMARY(
+
+        ssy = await stage_SHORT_SUMMARY(
             client=client,
             deployment=deployment,
             transcript=transcript,
             max_completion_tokens=max_completion_tokens,
             use_json_mode=use_json_mode,
         )
-        SHORT_SUMMARY = ctx.get("SHORT_SUMMARY", "Context Unspecified")
+        SHORT_SUMMARY = ssy.get("SHORT_SUMMARY", "Context Unspecified")
+
+        dsy = await stage_DETAILED_SUMMARY(
+            client=client,
+            deployment=deployment,
+            transcript=transcript,
+            max_completion_tokens=max_completion_tokens,
+            use_json_mode=use_json_mode,
+        )
+        DETAILED_SUMMARY = dsy.get("DETAILED_SUMMARY", "Context Unspecified")
 
         overall_conf = _min_conf(ct_conf, dom_conf, sub_conf, rc_conf, drv_conf)
 
@@ -168,11 +181,21 @@ async def analyze_transcript(
             "root_cause": root_cause,
             "contact_driver": contact_driver,
             "SHORT_SUMMARY": SHORT_SUMMARY,
+            "DETAILED_SUMMARY": DETAILED_SUMMARY,
             "confidence": overall_conf,
             "IS_NO_INPUT": 0,
         }
 
     except Exception:
+        preview = transcript[:300].replace("\n", " ")
+        logger.exception(
+            "exception analyze_transcript failed at stage=%s max_completion_tokens=%s use_json_mode=%s transcript_len=%s preview=%r",
+            stage,
+            max_completion_tokens,
+            use_json_mode,
+            len(transcript),
+            preview,
+        )
         # Keep the fallback simple and aligned with your "Other" philosophy:
         # we don't return any "Unclassified" labels.
         return {
@@ -182,6 +205,7 @@ async def analyze_transcript(
             "root_cause": "Other: Unspecified",
             "contact_driver": "Other: Unspecified",
             "SHORT_SUMMARY": "Context Unspecified",
+            "DETAILED_SUMMARY": "Context Unspecified",
             "confidence": 0.0,
             "IS_NO_INPUT": 0,
         }

@@ -19,6 +19,7 @@ from __future__ import annotations
 import asyncio
 import os
 import time
+import logging
 import datetime as dt
 from typing import Any, Dict, List
 
@@ -26,6 +27,7 @@ import pandas as pd
 
 from CCC_Classifier.pipeline.orchestrator import analyze_transcript
 
+logger = logging.getLogger(__name__)
 
 def _int_env(name: str, default: int) -> int:
     try:
@@ -59,7 +61,7 @@ async def process_batch(
     Returns:
         DataFrame with columns:
           CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE,
-          CONTACT_DRIVER, SHORT_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
+          CONTACT_DRIVER, SHORT_SUMMARY, DETAILED_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
           optional: _DURATION_MS
     """
     max_concurrent = _int_env("MAX_CONCURRENT", 8)
@@ -72,7 +74,6 @@ async def process_batch(
             rid = row.get(id_col)
             transcript = (row.get(text_col) or "")
             transcript = transcript if isinstance(transcript, str) else str(transcript)
-
             try:
                 result = await analyze_transcript(
                     client=client,
@@ -81,7 +82,15 @@ async def process_batch(
                     max_completion_tokens=max_completion_tokens,
                     use_json_mode=use_json_mode,
                 )
-            except Exception:
+            except Exception as ex:
+                preview = transcript[:300].replace("\n", " ")
+                logger.exception(
+                    "Error processing row rid=%r transcript_len=%s preview=%r",
+                    rid,
+                    len(transcript),
+                    preview,
+                )
+                print(f"Error processing row {rid}: {ex}")
                 # Very defensive fallback (should be rare because orchestrator already has a fallback)
                 result = {
                     "contact_type": "Unclear Contact",
@@ -90,6 +99,7 @@ async def process_batch(
                     "root_cause": "Other: Unspecified",
                     "contact_driver": "Other: Unspecified",
                     "SHORT_SUMMARY": "Context Unspecified",
+                    "DETAILED_SUMMARY": "Context Unspecified",
                     "confidence": 0.0,
                     "IS_NO_INPUT": 0,
                 }
@@ -105,6 +115,7 @@ async def process_batch(
                 "ROOT_CAUSE": result.get("root_cause", "Other: Unspecified"),
                 "CONTACT_DRIVER": result.get("contact_driver", "Other: Unspecified"),
                 "SHORT_SUMMARY": result.get("SHORT_SUMMARY", "Context Unspecified"),
+                "DETAILED_SUMMARY": result.get("DETAILED_SUMMARY", "Context Unspecified"),
                 "CONFIDENCE": float(result.get("confidence", 0.0) or 0.0),
                 "ANALYZED_AT": dt.datetime.utcnow(),
                 "IS_NO_INPUT": int(result.get("IS_NO_INPUT", 0) or 0),

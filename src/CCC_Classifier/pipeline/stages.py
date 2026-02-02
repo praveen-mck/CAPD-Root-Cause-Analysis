@@ -13,14 +13,15 @@ Design choices:
 - "No Customer Input" is allowed, but the decision of short-circuiting lives in orchestrator.py.
 """
 
-from __future__ import annotations
 
+from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from CCC_Classifier.llm.client import send_chat_request
 from CCC_Classifier.llm.parsing import clamp_conf, extract_content_and_usage, get_json_field, safe_parse_json
 from CCC_Classifier.pipeline.prompts import (
     system_prompt_SHORT_SUMMARY,
+    system_prompt_DETAILED_SUMMARY,
     system_prompt_contact_driver,
     system_prompt_contact_type,
     system_prompt_domain,
@@ -281,7 +282,6 @@ async def stage_contact_driver(
 
 
 
-
 async def stage_SHORT_SUMMARY(
     *,
     client: Any,
@@ -301,6 +301,10 @@ async def stage_SHORT_SUMMARY(
         max_out_tokens=max_completion_tokens,
         use_json_mode=use_json_mode,
     )
+
+    # Log the raw response for debugging
+    #logger_1.debug(f"Raw LLM response for short summary: {resp}")
+
 
     # Grab message object (if present)
     msg = None
@@ -360,10 +364,89 @@ async def stage_SHORT_SUMMARY(
         except Exception:
             reasons.append("message_inspect_error")
 
-        print("\n[SHORT_SUMMARY UNSPECIFIED] " + " | ".join(reasons))
-        # Optional: print raw content + parsed json for deep debugging
-        print("[SHORT_SUMMARY UNSPECIFIED] raw_content:", repr(content))
-        print("[SHORT_SUMMARY UNSPECIFIED] parsed_json:", data)
-        print("[SHORT_SUMMARY UNSPECIFIED] usage:", usage)
 
     return {"SHORT_SUMMARY": ctx, "_usage": usage, "_finish": finish}
+
+
+async def stage_DETAILED_SUMMARY(
+    *,
+    client: Any,
+    deployment: str,
+    transcript: str,
+    max_completion_tokens: int = 512,
+    use_json_mode: bool = True,
+) -> Dict[str, Any]:
+    sys_text = system_prompt_DETAILED_SUMMARY()
+    user_text = _user_transcript_block(transcript)
+
+    resp = await send_chat_request(
+        client=client,
+        deployment=deployment,
+        system_text=sys_text,
+        user_text=user_text,
+        max_out_tokens=max_completion_tokens,
+        use_json_mode=use_json_mode,
+    )
+
+    # Log the raw response for debugging
+    #logger_2.debug(f"Raw LLM response for detailed summary: {resp}")
+
+    # Grab message object (if present)
+    msg = None
+    try:
+        msg = resp.choices[0].message
+    except Exception:
+        msg = None
+
+    content, usage, finish = extract_content_and_usage(resp)
+    data = safe_parse_json(content)
+
+    ctx = _as_str(get_json_field(data, "DETAILED_SUMMARY", "")) or "Context Unspecified"
+
+    # ---- Only print diagnostics when ctx is unspecified ----
+    if ctx == "Context Unspecified":
+        reasons = []
+
+        # 1) Finish reason
+        if finish:
+            reasons.append(f"finish_reason={finish}")
+
+        # 2) Content presence
+        if content is None:
+            reasons.append("content=None (no assistant content returned)")
+        elif isinstance(content, str) and content.strip() == "":
+            reasons.append("content=empty_string")
+
+        # 3) JSON parsing / key presence
+        if not isinstance(data, dict) or not data:
+            reasons.append("parsed_json=empty_or_invalid")
+        else:
+            if "DETAILED_SUMMARY" not in data:
+                reasons.append(f"missing_key=DETAILED_SUMMARY (keys={list(data.keys())})")
+            else:
+                v = data.get("DETAILED_SUMMARY")
+                if v is None or (isinstance(v, str) and v.strip() == ""):
+                    reasons.append("DETAILED_SUMMARY_value=empty_or_null")
+
+        # 4) Token usage insights (very useful for your earlier issue)
+        try:
+            comp_details = (usage or {}).get("completion_tokens_details") or {}
+            rp = comp_details.get("reasoning_tokens", None)
+            ap = comp_details.get("accepted_prediction_tokens", None)
+            if rp is not None or ap is not None:
+                reasons.append(f"completion_tokens_details(reasoning={rp}, accepted_prediction={ap})")
+        except Exception:
+            pass
+
+        # 5) Message structure hints (tool calls, function calls)
+        try:
+            if msg is not None:
+                tc = getattr(msg, "tool_calls", None)
+                fc = getattr(msg, "function_call", None)
+                # Only note if present (or explicitly None)
+                reasons.append(f"tool_calls={'present' if tc else 'none'}")
+                reasons.append(f"function_call={'present' if fc else 'none'}")
+        except Exception:
+            reasons.append("message_inspect_error")
+
+    return {"DETAILED_SUMMARY": ctx, "_usage": usage, "_finish": finish}

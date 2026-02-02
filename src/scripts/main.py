@@ -30,6 +30,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Dict
+import logging
 
 import pandas as pd
 from openai import AsyncAzureOpenAI
@@ -56,6 +57,19 @@ from CCC_Classifier.io.snowflake import (
 )
 
 
+def _setup_logging(project_root: Path) -> None:
+    log_dir = project_root / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    logging.basicConfig(
+        level=os.getenv("LOG_LEVEL", "INFO").upper(),
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        handlers=[
+            logging.StreamHandler(),  # terminal
+            logging.FileHandler(log_dir / "run.log", mode="w", encoding="utf-8"),  # saved to disk
+        ],
+    )
+
 def _env(name: str, default: str | None = None, required: bool = False) -> str:
     v = os.getenv(name, default)
     if required and not v:
@@ -76,6 +90,7 @@ def _bool_env(name: str, default: bool) -> bool:
 
 
 async def main() -> None:
+    _setup_logging(PROJECT_ROOT)
     # ----------------------------
     # Job parameters (same as your original)
     # ----------------------------
@@ -206,6 +221,7 @@ async def main() -> None:
       "ROOT_CAUSE" STRING,
       "CONTACT_DRIVER" STRING,
       "SHORT_SUMMARY" STRING,
+      "DETAILED_SUMMARY" STRING,
       "CONFIDENCE" FLOAT,
       "ANALYZED_AT" TIMESTAMP_NTZ,
       "IS_NO_INPUT" NUMBER(1,0)
