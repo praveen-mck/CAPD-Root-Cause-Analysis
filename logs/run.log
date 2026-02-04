@@ -1,617 +1,591 @@
-2026-02-04 04:51:47,935 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:51:47,937 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:00:30,306 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:00:30,309 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '365a67ca-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '64af5d9c-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:51:48,036 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 401
+2026-02-04 18:00:30,430 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 401
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '365a67ca-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': 'c8c9bc8d-6e0a-4ccc-baae-259ab035962c'
+    'x-ms-client-request-id': '64af5d9c-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': 'a4ade461-957f-41da-836a-59200c20508c'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
     'WWW-Authenticate': 'Bearer authorization="https://login.microsoftonline.com/da67ef1b-ca59-4db2-9a8c-aa8d94617a16", resource="https://vault.azure.net"'
-    'Date': 'Wed, 04 Feb 2026 04:51:47 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:00:29 GMT'
     'Content-Length': '97'
-2026-02-04 04:51:48,037 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:00:30,431 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:51:48,039 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:00:30,433 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:51:48 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:00:30 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:51:48,040 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token_info succeeded
-2026-02-04 04:51:48,040 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token_info succeeded
-2026-02-04 04:51:48,040 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:00:30,434 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token_info succeeded
+2026-02-04 18:00:30,434 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token_info succeeded
+2026-02-04 18:00:30,434 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '365a67ca-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '64af5d9c-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:51:48,081 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:00:30,474 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '365a67ca-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': 'ae712e1e-ea97-45cf-b702-437e5f03493e'
+    'x-ms-client-request-id': '64af5d9c-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '90a2db51-1c34-4d85-a655-b94a79e6ac9a'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:51:47 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:00:29 GMT'
     'Content-Length': '2229'
-2026-02-04 04:51:48,083 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:51:48,084 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:00:30,475 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:00:30,476 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:51:48,086 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:00:30,478 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:51:48 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:00:30 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:51:48,087 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:51:48,087 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:51:48,087 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
+2026-02-04 18:00:30,478 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:00:30,478 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:00:30,479 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '3670da0a-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '64c8d434-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:51:48,189 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:00:30,584 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '3670da0a-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '8071d680-6632-4d96-84a8-9457f2d91af3'
+    'x-ms-client-request-id': '64c8d434-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '85a830cf-b8ec-4cb2-83fa-265a9fe2d473'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:51:48 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:00:30 GMT'
     'Content-Length': '348'
-2026-02-04 04:51:48,232 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
-2026-02-04 04:51:48,233 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
-2026-02-04 04:51:51,519 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:51,541 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:51,876 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:51,906 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:52,127 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:52,998 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:53,387 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:53,423 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:53,650 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:53,905 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:54,068 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:54,995 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:55,020 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:55,505 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:55,555 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:55,682 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:56,476 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:57,783 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:58,066 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:58,174 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:58,391 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:58,443 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:58,631 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:51:59,334 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:00,821 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:00,825 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:01,095 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:01,450 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:01,747 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:02,259 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:02,462 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:02,731 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:03,499 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:04,016 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:04,420 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:04,485 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:04,942 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:05,352 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:05,692 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:06,197 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:07,345 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:08,757 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:08,972 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:09,435 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:12,421 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:12,592 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:13,116 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:13,875 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:15,581 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:17,030 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:17,296 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:18,770 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:21,162 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:21,190 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:22,138 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:22,297 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:23,924 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:24,594 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:25,166 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:25,948 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:26,838 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:27,098 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:27,137 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:27,232 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:28,296 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:28,477 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:28,900 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:29,036 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:29,572 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:30,026 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:30,035 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:30,318 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:30,748 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:31,104 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:31,551 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:31,742 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:31,868 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:32,867 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:33,389 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:33,639 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:34,084 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:34,376 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:34,835 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:34,883 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:35,576 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:35,695 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:36,677 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:37,119 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:37,335 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:38,026 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:38,038 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:38,835 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:38,941 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:39,591 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:39,639 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:39,801 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:41,251 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:41,501 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:41,718 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:41,848 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:42,136 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:42,266 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:43,296 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:45,299 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:45,321 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:46,344 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:46,935 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:49,775 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:50,133 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:50,262 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:52,089 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:52,952 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:53,053 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:53,545 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:54,295 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:54,320 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:56,412 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:56,524 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:56,530 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:52:58,601 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:02,645 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:02,939 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:03,307 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:05,903 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:09,462 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:20,113 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
-2026-02-04 04:53:20,118 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:20,120 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:00:30,634 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
+2026-02-04 18:00:30,635 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
+2026-02-04 18:00:39,728 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:40,034 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:40,393 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:40,551 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:40,608 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:41,505 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:41,556 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:42,221 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:42,712 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:42,797 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:42,947 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:43,338 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:44,044 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:44,269 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:44,548 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:44,657 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:44,867 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:44,873 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:46,431 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:46,645 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:46,776 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:47,430 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:47,669 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:47,862 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:48,317 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:50,125 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:50,148 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:51,492 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:51,514 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:51,651 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:52,329 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:53,437 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:53,951 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:54,452 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:54,636 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:55,177 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:55,204 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:56,040 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:56,383 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:57,326 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:57,826 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:58,521 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:59,717 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:00:59,907 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:00,273 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:00,368 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:00,507 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:01,669 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:01,979 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:02,263 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:02,847 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:03,213 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:03,230 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:03,234 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:04,376 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:04,849 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:05,708 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:05,981 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:06,267 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:06,593 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:06,602 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:08,041 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:08,656 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:08,973 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:09,022 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:09,833 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:09,840 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:10,577 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:11,954 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:12,438 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:12,484 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:12,488 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:13,296 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:13,812 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:14,162 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:14,483 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:14,817 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:16,053 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:16,972 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:17,122 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:17,124 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:18,662 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:18,698 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:19,427 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:19,463 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:19,930 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:21,071 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:21,085 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:21,993 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:22,481 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:22,857 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:23,298 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:24,451 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:24,599 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:26,092 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:26,239 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:29,907 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:30,830 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:33,826 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:35,262 INFO httpx: HTTP Request: POST https://mt-openai-nonprod-eastus2.openai.azure.com/openai/deployments/mckopenai-gpt5-2025-08-07/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-02-04 18:01:35,268 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:35,269 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:20,123 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:35,272 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:20 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:35 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:20,123 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:20,123 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:20,124 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:01:35,272 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:35,273 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:35,273 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '6d4c6238-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '8b677ce4-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:20,214 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:35,417 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '6d4c6238-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': 'edf3f7fe-fc5a-4bce-9e38-f6d1d825b900'
+    'x-ms-client-request-id': '8b677ce4-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '9846865d-c754-47fd-a49f-dc6e2d5ce12f'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:19 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:34 GMT'
     'Content-Length': '2229'
-2026-02-04 04:53:20,215 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:20,216 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:35,418 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:35,419 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:20,219 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:35,421 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:20 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:35 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:20,219 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:20,219 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:20,219 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
+2026-02-04 18:01:35,422 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:35,422 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:35,422 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '6d5b2a8e-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '8b7e6d50-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:20,312 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:35,562 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '6d5b2a8e-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': 'd853aa5f-a1af-4e91-9cb0-ea5dd6141ca6'
+    'x-ms-client-request-id': '8b7e6d50-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '8ecd7ded-ab5f-430d-9127-edb98877c6fd'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:20 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:34 GMT'
     'Content-Length': '348'
-2026-02-04 04:53:20,354 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
-2026-02-04 04:53:20,354 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
-2026-02-04 04:53:21,511 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:21,513 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:35,602 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
+2026-02-04 18:01:35,603 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
+2026-02-04 18:01:37,753 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:37,754 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:21,515 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:37,757 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:21 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:37 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:21,516 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:21,516 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:21,516 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:01:37,757 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:37,757 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:37,757 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '6e20ea76-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '8ce2a260-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:21,663 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:37,892 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '6e20ea76-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': 'e81f61ac-a5c1-44fd-b366-b5388d329782'
+    'x-ms-client-request-id': '8ce2a260-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': 'd0fc3e15-58cb-4207-a17b-7f4613bcad72'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:21 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:37 GMT'
     'Content-Length': '2229'
-2026-02-04 04:53:21,665 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:21,666 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:37,893 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:37,894 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:21,668 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:37,897 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:21 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:37 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:21,668 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:21,668 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:21,668 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
+2026-02-04 18:01:37,897 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:37,897 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:37,897 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '6e384d24-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '8cf8090c-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:21,758 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:38,025 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '6e384d24-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '39633145-4aeb-46b9-846b-f4654add03db'
+    'x-ms-client-request-id': '8cf8090c-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '16095f62-dabf-4236-8ddc-137c49005c1d'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:21 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:37 GMT'
     'Content-Length': '348'
-2026-02-04 04:53:21,800 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
-2026-02-04 04:53:21,800 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
-2026-02-04 04:53:26,185 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:26,186 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:38,065 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
+2026-02-04 18:01:38,066 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
+2026-02-04 18:01:43,956 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:43,957 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:26,189 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:43,960 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:26 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:43 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:26,189 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:26,189 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:26,190 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:01:43,961 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:43,961 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:43,961 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '70ea17c8-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '909534a4-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:26,279 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:44,117 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '70ea17c8-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '09a3deec-ce05-43a9-9b2c-b3d245820be1'
+    'x-ms-client-request-id': '909534a4-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '03657723-f9f1-47d4-8c6f-9b900330c3d6'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:25 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:43 GMT'
     'Content-Length': '2229'
-2026-02-04 04:53:26,281 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:26,282 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:44,118 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:44,119 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:26,284 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:44,122 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:26 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:44 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:26,284 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:26,284 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:26,284 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
+2026-02-04 18:01:44,122 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:44,122 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:44,123 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '70f8a1e4-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '90ade76a-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:26,379 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:44,240 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '70f8a1e4-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '3723e92c-a766-49a4-85db-349c08cdef84'
+    'x-ms-client-request-id': '90ade76a-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': 'f18b9be1-a9fc-4a6a-9bda-5ed2dd0ad7e0'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:25 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:43 GMT'
     'Content-Length': '348'
-2026-02-04 04:53:26,424 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
-2026-02-04 04:53:26,425 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
-2026-02-04 04:53:27,637 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:27,639 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:44,281 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
+2026-02-04 18:01:44,282 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
+2026-02-04 18:01:45,741 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:45,743 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:27,641 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:45,746 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:27 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:45 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:27,642 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:27,642 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:27,642 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:01:45,746 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:45,746 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:45,747 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '71c7b416-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '91a5a41e-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:27,739 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:45,866 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '71c7b416-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '10ba01fc-535c-40ba-9ff5-32841d8f4456'
+    'x-ms-client-request-id': '91a5a41e-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '92e11450-67d2-49f1-ac86-a6deda65034b'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:26 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:45 GMT'
     'Content-Length': '2229'
-2026-02-04 04:53:27,740 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:27,741 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:45,867 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:45,868 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:27,743 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:45,870 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:27 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:45 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:27,743 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:27,744 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:27,744 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
+2026-02-04 18:01:45,871 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:45,871 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:45,871 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '71d74d4a-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '91b8c2ba-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:27,827 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:45,987 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '71d74d4a-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '1d7088a4-76d9-44f6-8aa2-5a3f7d08c1e4'
+    'x-ms-client-request-id': '91b8c2ba-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': 'aa1b1de9-0c5f-499a-8b5d-462f9320d60b'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:27 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:45 GMT'
     'Content-Length': '348'
-2026-02-04 04:53:27,868 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
-2026-02-04 04:53:27,869 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
-2026-02-04 04:53:29,233 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:29,235 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:46,029 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
+2026-02-04 18:01:46,030 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
+2026-02-04 18:01:47,927 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:47,929 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:29,237 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:47,932 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:29 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:47 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:29,238 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:29,238 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:29,238 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
+2026-02-04 18:01:47,932 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:47,932 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:47,932 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-rsakey/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '72bb3c30-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '92f3344e-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:29,334 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:48,085 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '72bb3c30-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '40f74472-b6c1-4495-8d42-089d90678f19'
+    'x-ms-client-request-id': '92f3344e-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': '455adb73-07fc-449c-9b06-59e744ac14da'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:28 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:47 GMT'
     'Content-Length': '2229'
-2026-02-04 04:53:29,335 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
-2026-02-04 04:53:29,336 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
+2026-02-04 18:01:48,086 INFO azure.identity._credentials.managed_identity: ManagedIdentityCredential will use Azure ML managed identity
+2026-02-04 18:01:48,087 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'http://127.0.0.1:46808/MSI/auth?api-version=REDACTED&resource=REDACTED'
 Request method: 'GET'
 Request headers:
     'secret': 'REDACTED'
     'User-Agent': 'azsdk-python-identity/1.21.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
 No body was attached to the request
-2026-02-04 04:53:29,339 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:48,089 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Content-Type': 'application/json'
-    'Date': 'Wed, 04 Feb 2026 04:53:29 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:48 GMT'
     'Transfer-Encoding': 'chunked'
-2026-02-04 04:53:29,339 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
-2026-02-04 04:53:29,339 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
-2026-02-04 04:53:29,340 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
+2026-02-04 18:01:48,089 INFO azure.identity._internal.msal_managed_identity_client: AzureMLCredential.get_token succeeded
+2026-02-04 18:01:48,090 INFO azure.identity._internal.decorators: ManagedIdentityCredential.get_token succeeded
+2026-02-04 18:01:48,090 INFO azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://kv-mlops-aibigbets-dev.vault.azure.net/secrets/bigbets-dev-snowflake-pem-passphrase/?api-version=REDACTED'
 Request method: 'GET'
 Request headers:
     'Accept': 'application/json'
-    'x-ms-client-request-id': '72cabf2a-0185-11f1-b0bb-6045bdae1040'
+    'x-ms-client-request-id': '930b5b46-01f3-11f1-be39-6045bdae1040'
     'User-Agent': 'azsdk-python-keyvault-secrets/4.7.0 Python/3.10.11 (Linux-6.8.0-1030-azure-x86_64-with-glibc2.35)'
     'Authorization': 'REDACTED'
 No body was attached to the request
-2026-02-04 04:53:29,440 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
+2026-02-04 18:01:48,227 INFO azure.core.pipeline.policies.http_logging_policy: Response status: 200
 Response headers:
     'Cache-Control': 'no-cache'
     'Pragma': 'no-cache'
     'Content-Type': 'application/json; charset=utf-8'
     'Expires': '-1'
     'x-ms-keyvault-region': 'westus3'
-    'x-ms-client-request-id': '72cabf2a-0185-11f1-b0bb-6045bdae1040'
-    'x-ms-request-id': '1596ff53-8c3b-4775-9d05-f4573419e8c0'
+    'x-ms-client-request-id': '930b5b46-01f3-11f1-be39-6045bdae1040'
+    'x-ms-request-id': 'f171e8fd-5b01-4f0f-b666-7c62b13f6db8'
     'x-ms-keyvault-service-version': '1.9.3019.1'
     'x-ms-keyvault-network-info': 'conn_type=PrivateLink;private_endpoint=/subscriptions/4fa11b41-3c24-426f-8d1e-ab9638e020b1/resourceGroups/rg-aibigbets-azml-prod/providers/Microsoft.Network/privateEndpoints/ple-kv-mlops-aibigbets-dev;addr=10.30.34.58;act_addr_fam=InterNetworkV6;'
     'x-ms-keyvault-rbac-assignment-id': 'REDACTED'
     'X-Content-Type-Options': 'REDACTED'
     'Strict-Transport-Security': 'REDACTED'
-    'Date': 'Wed, 04 Feb 2026 04:53:29 GMT'
+    'Date': 'Wed, 04 Feb 2026 18:01:48 GMT'
     'Content-Length': '348'
-2026-02-04 04:53:29,480 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
-2026-02-04 04:53:29,481 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
+2026-02-04 18:01:48,270 INFO snowflake.connector.connection: Snowflake Connector for Python Version: 4.1.0, Python Version: 3.10.11, Platform: Linux-6.8.0-1030-azure-x86_64-with-glibc2.35
+2026-02-04 18:01:48,271 INFO snowflake.connector.connection: Connecting to GLOBAL Snowflake domain
