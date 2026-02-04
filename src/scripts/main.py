@@ -1,40 +1,29 @@
-
 """
 scripts/main.py
 
 Thin terminal entrypoint for CCC classifier.
-- Reads transcripts from Snowflake
-- Runs async batch classifier (Azure OpenAI)
-- Writes results to Snowflake (stage -> merge -> drop stage)
 
-Run:
-  python scripts/main.py
-
-Optional environment variables (same spirit as your original script):
-  SOURCE_DB, SOURCE_SCHEMA, SOURCE_TABLE
-  RESULT_DB, RESULT_SCHEMA, RESULT_TABLE
-  ID_COL, TEXT_COL, WHERE_CLAUSE, MAX_ROWS
-  MAX_CONCURRENT, MAX_COMPLETION_TOKENS, USE_JSON_MODE
-
-  SF_USER, SF_URL, SF_WAREHOUSE, SF_ROLE
-  SF_RSA_KEY_SECRET, SF_PEM_PASSPHRASE_SECRET, SF_KEYVAULT_NAME
-  AZURE_OPENAI_API_KEY, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT_NAME
+Responsibilities:
+- Parse CLI args and environment configuration
+- Create Azure OpenAI client
+- Orchestrate pipeline execution (predict / grade)
+- Delegate Snowflake read/write to CCC_Classifier.io.snowflake helpers
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import json
+import logging
 import os
 import sys
 import time
 from pathlib import Path
 from typing import Any, Dict
-import logging
 
 import pandas as pd
 from openai import AsyncAzureOpenAI
-
 
 # ----------------------------
 # Make src/ importable
@@ -44,19 +33,18 @@ SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
-
 # ----------------------------
-# Imports from your refactored package
+# Imports from package
 # ----------------------------
-from CCC_Classifier.pipeline.batch import process_batch  # async batch runner
+from CCC_Classifier.pipeline.batch import process_batch
 from CCC_Classifier.io.snowflake import (
-    extract_data_from_snowflake,
-    execute_snowflake_multi_query,
-    write_pandas_create_or_replace_stage,
-    merge_results_into_table,
+    load_transcripts,
+    write_stage_and_merge,
 )
 
-
+# ----------------------------
+# Local helpers
+# ----------------------------
 def _setup_logging(project_root: Path) -> None:
     log_dir = project_root / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -65,10 +53,11 @@ def _setup_logging(project_root: Path) -> None:
         level=os.getenv("LOG_LEVEL", "INFO").upper(),
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
         handlers=[
-            logging.StreamHandler(),  # terminal
-            logging.FileHandler(log_dir / "run.log", mode="w", encoding="utf-8"),  # saved to disk
+            logging.StreamHandler(),
+            logging.FileHandler(log_dir / "run.log", mode="w", encoding="utf-8"),
         ],
     )
+
 
 def _env(name: str, default: str | None = None, required: bool = False) -> str:
     v = os.getenv(name, default)
@@ -89,36 +78,29 @@ def _bool_env(name: str, default: bool) -> bool:
     return raw in ("1", "true", "t", "yes", "y")
 
 
-async def main() -> None:
-    _setup_logging(PROJECT_ROOT)
-    # ----------------------------
-    # Job parameters (same as your original)
-    # ----------------------------
-    SOURCE_DB = _env("SOURCE_DB", "DEV_MT_BIG_BETS_DB")
-    SOURCE_SCHEMA = _env("SOURCE_SCHEMA", "POC")
-    SOURCE_TABLE = _env("SOURCE_TABLE", "CHAT_TRANSCRIPTS_JULY_TO_SEPT_2025_V2")
-    # CHAT_TRANSCRIPTS_JULY_TO_SEPT_2025_V2_OTHERS (Testing)
-    ID_COL = _env("ID_COL", "CHAT_TRANSCRIPT_NAME")
-    TEXT_COL = _env("TEXT_COL", "BODY")
+def _parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="CCC Classifier")
+    p.add_argument(
+        "--mode",
+        choices=("predict", "grade"),
+        default="predict",
+        help="Run mode. 'predict' runs classification; 'grade' runs pass-2 grading (to be implemented).",
+    )
+    return p.parse_args()
 
-    RESULT_DB = _env("RESULT_DB", SOURCE_DB)
-    RESULT_SCHEMA = _env("RESULT_SCHEMA", SOURCE_SCHEMA)
-    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD")
 
-    WHERE_CLAUSE = _env("WHERE_CLAUSE", "WHERE BODY IS NOT NULL")
-    MAX_ROWS = _int_env("MAX_ROWS", 20)
+def _build_snowflake_cfg(*, source_db: str, source_schema: str) -> Dict[str, Any]:
+    """
+    Build Snowflake cfg expected by CCC_Classifier.io.snowflake.*.
 
-    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 256)
-    USE_JSON_MODE = _bool_env("USE_JSON_MODE", True)
-
-    # ----------------------------
-    # Snowflake config (Key Vault + key-pair auth)
-    # ----------------------------
-    sf_cfg: Dict[str, Any] = {
+    Note: cfg["database"] / cfg["schema"] are used as defaults by helpers but may be overridden
+    internally for output operations.
+    """
+    return {
         "sf_user": _env("SF_USER", "DEV_MT_BIGBETS_AU"),
         "sf_url": _env("SF_URL", required=True),
-        "database": SOURCE_DB,
-        "schema": SOURCE_SCHEMA,
+        "database": source_db,
+        "schema": source_schema,
         "warehouse": _env("SF_WAREHOUSE", "DEV_MT_BIG_BETS_WH"),
         "role": _env("SF_ROLE", "DEV_MT_BIG_BETS_ENGINEER_FR"),
         "rsa_key_secret_name": _env("SF_RSA_KEY_SECRET", "bigbets-dev-snowflake-rsakey"),
@@ -126,9 +108,8 @@ async def main() -> None:
         "keyvault_name": _env("SF_KEYVAULT_NAME", "kv-mlops-aibigbets-dev"),
     }
 
-    # ----------------------------
-    # Azure OpenAI (required)
-    # ----------------------------
+
+def _build_aoai_client() -> tuple[AsyncAzureOpenAI, str]:
     _env("AZURE_OPENAI_API_KEY", required=True)
     _env("AZURE_OPENAI_API_VERSION", required=True)
     _env("AZURE_OPENAI_ENDPOINT", required=True)
@@ -139,36 +120,57 @@ async def main() -> None:
         api_version=_env("AZURE_OPENAI_API_VERSION"),
         azure_endpoint=_env("AZURE_OPENAI_ENDPOINT"),
     )
+    return client, deployment
 
-    # ----------------------------
-    # Read inputs from Snowflake
-    # ----------------------------
-    where = f" {WHERE_CLAUSE}" if WHERE_CLAUSE.strip() else ""
-    select_sql = f"""
-    SELECT {ID_COL}, {TEXT_COL}
-    FROM {SOURCE_DB}.{SOURCE_SCHEMA}.{SOURCE_TABLE}
-    {where}
-    LIMIT {MAX_ROWS};
-    """
 
-    print(f"\n[main] Reading input rows from Snowflake:\n{select_sql.strip()}")
+# ----------------------------
+# Modes
+# ----------------------------
+async def run_predict() -> None:
+    _setup_logging(PROJECT_ROOT)
+
+    # Inputs
+    SOURCE_DB = _env("SOURCE_DB", "DEV_MT_BIG_BETS_DB")
+    SOURCE_SCHEMA = _env("SOURCE_SCHEMA", "POC")
+    SOURCE_TABLE = _env("SOURCE_TABLE", "CHAT_TRANSCRIPTS_JULY_TO_SEPT_2025_V2")
+    ID_COL = _env("ID_COL", "CHAT_TRANSCRIPT_NAME")
+    TEXT_COL = _env("TEXT_COL", "BODY")
+
+    # Outputs
+    RESULT_DB = _env("RESULT_DB", SOURCE_DB)
+    RESULT_SCHEMA = _env("RESULT_SCHEMA", SOURCE_SCHEMA)
+    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD")
+
+    WHERE_CLAUSE = _env("WHERE_CLAUSE", "WHERE BODY IS NOT NULL")
+    MAX_ROWS = _int_env("MAX_ROWS", 20)
+
+    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 256)
+    USE_JSON_MODE = _bool_env("USE_JSON_MODE", True)
+
+    sf_cfg = _build_snowflake_cfg(source_db=SOURCE_DB, source_schema=SOURCE_SCHEMA)
+    client, deployment = _build_aoai_client()
+
+    # Read inputs (Snowflake helper)
+    print("\n[main] Reading input rows from Snowflake...")
     t0 = time.perf_counter()
-    src_df = extract_data_from_snowflake(sf_cfg, select_sql)
+    src_df = load_transcripts(
+        sf_cfg,
+        source_db=SOURCE_DB,
+        source_schema=SOURCE_SCHEMA,
+        source_table=SOURCE_TABLE,
+        id_col=ID_COL,
+        text_col=TEXT_COL,
+        where_clause=WHERE_CLAUSE,
+        limit=MAX_ROWS,
+    )
     print(f"[main] Loaded {len(src_df)} rows in {round(time.perf_counter() - t0, 2)}s")
 
     if src_df.empty:
         print("[main] No rows to process. Exiting.")
         return
 
-    # ----------------------------
-    # Run batch classification (async)
-    # process_batch should do:
-    # - concurrency
-    # - call analyze_transcript for each row
-    # - return DataFrame with output columns
-    # ----------------------------
+    # Run inference
     rows = src_df.to_dict(orient="records")
-
     print(
         f"\n[main] Classifying {len(rows)} transcripts "
         f"(deployment={deployment}, max_tokens={MAX_COMPLETION_TOKENS}, json_mode={USE_JSON_MODE})"
@@ -187,63 +189,29 @@ async def main() -> None:
     infer_s = time.perf_counter() - t1
     print(f"[main] Inference done in {round(infer_s, 2)}s. Results rows: {len(results_df)}")
 
-    # Normalize timestamp field as string (Snowflake stage table creation in your helper may expect this)
+    # Optional: normalize ANALYZED_AT to string (matches existing behavior)
     if "ANALYZED_AT" in results_df.columns:
         results_df["ANALYZED_AT"] = pd.to_datetime(results_df["ANALYZED_AT"], errors="coerce").dt.strftime(
             "%Y-%m-%d %H:%M:%S"
         )
 
-    # ----------------------------
-    # Write stage + merge into target + cleanup stage
-    # ----------------------------
-    temp_table = f"{RESULT_TABLE}_STAGE"
-
-    # Use RESULT_DB/SCHEMA for writing results
-    out_cfg = dict(sf_cfg)
-    out_cfg["database"] = RESULT_DB
-    out_cfg["schema"] = RESULT_SCHEMA
-
-    print(f"\n[main] Writing stage table: {RESULT_DB}.{RESULT_SCHEMA}.{temp_table}")
+    # Persist results (Snowflake helper does: stage write -> ensure target -> merge -> drop stage)
+    print(f"\n[main] Writing stage + merging into target: {RESULT_DB}.{RESULT_SCHEMA}.{RESULT_TABLE}")
     t2 = time.perf_counter()
-    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, results_df, temp_table)
+    success, nchunks, nrows, stage_table = write_stage_and_merge(
+        sf_cfg,
+        results_df=results_df,
+        result_db=RESULT_DB,
+        result_schema=RESULT_SCHEMA,
+        result_table=RESULT_TABLE,
+        id_col="CHAT_TRANSCRIPT_NAME",
+        drop_stage=True,
+    )
     print(
-        f"[main] Stage write: success={success}, chunks={nchunks}, rows={nrows} "
-        f"in {round(time.perf_counter() - t2, 2)}s"
+        f"[main] Snowflake write/merge done in {round(time.perf_counter() - t2, 2)}s "
+        f"(stage={stage_table}, success={success}, chunks={nchunks}, rows={nrows})"
     )
 
-    # Ensure target table exists (keep it basic; add columns you need)
-    create_target_sql = f"""
-    CREATE TABLE IF NOT EXISTS "{RESULT_DB}"."{RESULT_SCHEMA}"."{RESULT_TABLE}" (
-      "CHAT_TRANSCRIPT_NAME" STRING,
-      "CONTACT_TYPE" STRING,
-      "DOMAIN" STRING,
-      "SUBDOMAIN" STRING,
-      "ROOT_CAUSE" STRING,
-      "CONTACT_DRIVER" STRING,
-      "SHORT_SUMMARY" STRING,
-      "DETAILED_SUMMARY" STRING,
-      "CONFIDENCE" FLOAT,
-      "ANALYZED_AT" TIMESTAMP_NTZ,
-      "IS_NO_INPUT" NUMBER(1,0)
-    );
-    """
-    execute_snowflake_multi_query(out_cfg, create_target_sql)
-
-    print(f"[main] Merging stage -> target: {RESULT_DB}.{RESULT_SCHEMA}.{RESULT_TABLE}")
-    merge_results_into_table(
-        cfg=out_cfg,
-        target_table=RESULT_TABLE,
-        stage_table=temp_table,
-        id_col="CHAT_TRANSCRIPT_NAME",  # keep this consistent with your pipeline output
-    )
-
-    print("[main] Dropping stage table...")
-    drop_sql = f'DROP TABLE IF EXISTS "{RESULT_DB}"."{RESULT_SCHEMA}"."{temp_table}";'
-    execute_snowflake_multi_query(out_cfg, drop_sql)
-
-    # ----------------------------
-    # Print simple metrics
-    # ----------------------------
     metrics = {
         "records_processed": int(len(results_df)),
         "inference_seconds": round(infer_s, 2),
@@ -251,9 +219,30 @@ async def main() -> None:
         "deployment": deployment,
         "max_completion_tokens": MAX_COMPLETION_TOKENS,
         "use_json_mode": USE_JSON_MODE,
+        "mode": "predict",
     }
     print("\n=== Batch Metrics ===")
     print(json.dumps(metrics, indent=2))
+
+
+async def run_grade() -> None:
+    _setup_logging(PROJECT_ROOT)
+    raise NotImplementedError(
+        "Mode=grade is not implemented yet. Next step: define grade inputs (source table/columns) and output table."
+    )
+
+
+# ----------------------------
+# Entry
+# ----------------------------
+async def main() -> None:
+    args = _parse_args()
+    if args.mode == "predict":
+        await run_predict()
+    elif args.mode == "grade":
+        await run_grade()
+    else:
+        raise RuntimeError(f"Unknown mode: {args.mode}")
 
 
 if __name__ == "__main__":

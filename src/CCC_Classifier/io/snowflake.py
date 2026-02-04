@@ -225,6 +225,94 @@ def write_pandas_create_or_replace_stage(
     finally:
         conn.close()
 
+def load_transcripts(
+    cfg: Dict[str, Any],
+    *,
+    source_db: str,
+    source_schema: str,
+    source_table: str,
+    id_col: str,
+    text_col: str,
+    where_clause: str = "",
+    limit: int = 0,
+) -> pd.DataFrame:
+    """
+    Load (id_col, text_col) rows from Snowflake.
+    where_clause may be "" or start with "WHERE ...".
+    """
+    where = f" {where_clause}" if where_clause.strip() else ""
+    lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
+    sql = f"""
+    SELECT {id_col}, {text_col}
+    FROM {source_db}.{source_schema}.{source_table}
+    {where}{lim};
+    """
+    return extract_data_from_snowflake(cfg, sql)
+
+
+def ensure_results_table_exists(cfg: Dict[str, Any], *, result_db: str, result_schema: str, result_table: str) -> None:
+    """
+    Create base results table (Pass-1 columns). Pass-2 columns are added later by merge_results_into_table.
+    """
+    sql = f"""
+    CREATE TABLE IF NOT EXISTS "{result_db}"."{result_schema}"."{result_table}" (
+      "CHAT_TRANSCRIPT_NAME" STRING,
+      "CONTACT_TYPE" STRING,
+      "DOMAIN" STRING,
+      "SUBDOMAIN" STRING,
+      "ROOT_CAUSE" STRING,
+      "CONTACT_DRIVER" STRING,
+      "SHORT_SUMMARY" STRING,
+      "DETAILED_SUMMARY" STRING,
+      "CONFIDENCE" FLOAT,
+      "ANALYZED_AT" TIMESTAMP_NTZ,
+      "IS_NO_INPUT" NUMBER(1,0)
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+
+def drop_table_if_exists(cfg: Dict[str, Any], *, db: str, schema: str, table: str) -> None:
+    sql = f'DROP TABLE IF EXISTS "{db}"."{schema}"."{table}";'
+    execute_snowflake_multi_query(cfg, sql)
+
+
+def write_stage_and_merge(
+    cfg: Dict[str, Any],
+    *,
+    results_df: pd.DataFrame,
+    result_db: str,
+    result_schema: str,
+    result_table: str,
+    id_col: str,
+    stage_suffix: str = "_STAGE",
+    drop_stage: bool = True,
+) -> Tuple[bool, int, int, str]:
+    """
+    Write results_df to a stage table, MERGE into result_table, optionally drop stage.
+    Returns (success, nchunks, nrows, stage_table_name).
+    """
+    stage_table = f"{result_table}{stage_suffix}"
+
+    out_cfg = dict(cfg)
+    out_cfg["database"] = result_db
+    out_cfg["schema"] = result_schema
+
+    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, results_df, stage_table)
+
+    ensure_results_table_exists(out_cfg, result_db=result_db, result_schema=result_schema, result_table=result_table)
+
+    merge_results_into_table(
+        cfg=out_cfg,
+        target_table=result_table,
+        stage_table=stage_table,
+        id_col=id_col,
+    )
+
+    if drop_stage:
+        drop_table_if_exists(out_cfg, db=result_db, schema=result_schema, table=stage_table)
+
+    return success, nchunks, nrows, stage_table
 
 def merge_results_into_table(
     cfg: Dict[str, Any],
