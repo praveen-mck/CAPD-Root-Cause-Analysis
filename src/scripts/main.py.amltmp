@@ -47,12 +47,13 @@ if str(SRC_PATH) not in sys.path:
 # ----------------------------
 # Imports from your refactored package
 # ----------------------------
-from CCC_Classifier.pipeline.batch import process_batch  # async batch runner
+from CCC_Classifier.pipeline.batch import process_batch_chats  # async batch runner
 from CCC_Classifier.io.snowflake import (
     extract_data_from_snowflake,
     execute_snowflake_multi_query,
     write_pandas_create_or_replace_stage,
-    merge_results_into_table,
+    merge_chats_results_into_table,
+    merge_calls_results_into_table,
 )
 
 
@@ -160,7 +161,7 @@ async def main() -> None:
     )
 
     t1 = time.perf_counter()
-    results_df = await process_batch(
+    results_df = await process_batch_chats(
         client=client,
         deployment=deployment,
         rows=rows,

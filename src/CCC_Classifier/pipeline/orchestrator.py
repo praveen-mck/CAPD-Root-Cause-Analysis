@@ -91,10 +91,14 @@ async def analyze_transcript(
     if not transcript or is_no_customer_input(transcript):
         return _no_input_result()
 
+    # Initialize stage variable to be used in exception message
+    stage = ''
+
     # 2) Run stages sequentially
     #    We keep it simple: run domain even if contact type is "Unclear Contact",
     #    because you removed "Unclassified" and want Others captured instead of blank placeholders.
     try:
+        stage = 'contact_type'
         ct = await stage_contact_type(
             client=client,
             deployment=deployment,
@@ -105,6 +109,7 @@ async def analyze_transcript(
         contact_type = ct.get("contact_type", "Unclear Contact")
         ct_conf = ct.get("confidence", 0.0)
 
+        stage = 'domain'
         dom = await stage_domain(
             client=client,
             deployment=deployment,
@@ -121,6 +126,7 @@ async def analyze_transcript(
         if domain == "No Customer Input":
             return _no_input_result()
 
+        stage = 'subdomain'
         sub = await stage_subdomain(
             client=client,
             deployment=deployment,
@@ -132,6 +138,7 @@ async def analyze_transcript(
         subdomain = sub.get("subdomain", "")
         sub_conf = sub.get("confidence", 0.0)
 
+        stage = 'root_cause'
         rc = await stage_root_cause(
             client=client,
             deployment=deployment,
@@ -143,6 +150,7 @@ async def analyze_transcript(
         root_cause = rc.get("root_cause", "")
         rc_conf = rc.get("confidence", 0.0)
 
+        stage = 'contact_driver'
         drv = await stage_contact_driver(
             client=client,
             deployment=deployment,
@@ -153,7 +161,7 @@ async def analyze_transcript(
         contact_driver = drv.get("contact_driver", "")
         drv_conf = drv.get("confidence", 0.0)
 
-
+        stage = 'short_summary'
         ssy = await stage_SHORT_SUMMARY(
             client=client,
             deployment=deployment,
@@ -163,6 +171,7 @@ async def analyze_transcript(
         )
         SHORT_SUMMARY = ssy.get("SHORT_SUMMARY", "Context Unspecified")
 
+        stage = 'detailed_summary'
         dsy = await stage_DETAILED_SUMMARY(
             client=client,
             deployment=deployment,

@@ -36,14 +36,16 @@ if str(SRC_PATH) not in sys.path:
 # ----------------------------
 # Imports from package
 # ----------------------------
-from CCC_Classifier.pipeline.batch import process_batch
+from CCC_Classifier.pipeline.batch import process_batch_chats
+from CCC_Classifier.pipeline.batch import process_batch_calls
 from CCC_Classifier.pipeline.grader.batch_grades import process_grade_batch
 from CCC_Classifier.io.snowflake import (
     load_transcripts,
-    write_stage_and_merge,
+    write_stage_and_merge_chats,
     load_predictions_for_grading_join_source,
     write_stage_and_merge_grades,
     new_grader_run_id,
+    write_stage_and_merge_calls,
 )
 
 # ----------------------------
@@ -86,9 +88,9 @@ def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="CCC Classifier")
     p.add_argument(
         "--mode",
-        choices=("predict", "grade"),
-        default="predict",
-        help="Run mode. 'predict' runs classification; 'grade' runs pass-2 grading (to be implemented).",
+        choices=("predict_chats", "grade","predict_calls"),
+        default="predict_chats",
+        help="Run mode. 'predict_chats' runs classification for chats; 'grade' runs pass-2 grading;  'predict_calls' runs on call transcripts.",
     )
     return p.parse_args()
 
@@ -130,7 +132,9 @@ def _build_aoai_client() -> tuple[AsyncAzureOpenAI, str]:
 # ----------------------------
 # Modes
 # ----------------------------
-async def run_predict() -> None:
+
+# PREDICT for Chats
+async def run_predict_chats() -> None:
     _setup_logging(PROJECT_ROOT)
 
     # Inputs
@@ -143,12 +147,12 @@ async def run_predict() -> None:
     # Outputs
     RESULT_DB = _env("RESULT_DB", SOURCE_DB)
     RESULT_SCHEMA = _env("RESULT_SCHEMA", SOURCE_SCHEMA)
-    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD")
+    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_TEST")
 
     WHERE_CLAUSE = _env("WHERE_CLAUSE", "WHERE BODY IS NOT NULL")
-    MAX_ROWS = _int_env("MAX_ROWS", 20)
+    MAX_ROWS = _int_env("MAX_ROWS", 2000)
 
-    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 256)
+    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 1024)
     USE_JSON_MODE = _bool_env("USE_JSON_MODE", True)
 
     sf_cfg = _build_snowflake_cfg(source_db=SOURCE_DB, source_schema=SOURCE_SCHEMA)
@@ -181,7 +185,7 @@ async def run_predict() -> None:
     )
 
     t1 = time.perf_counter()
-    results_df = await process_batch(
+    results_df = await process_batch_chats(
         client=client,
         deployment=deployment,
         rows=rows,
@@ -202,7 +206,7 @@ async def run_predict() -> None:
     # Persist results (Snowflake helper does: stage write -> ensure target -> merge -> drop stage)
     print(f"\n[main] Writing stage + merging into target: {RESULT_DB}.{RESULT_SCHEMA}.{RESULT_TABLE}")
     t2 = time.perf_counter()
-    success, nchunks, nrows, stage_table = write_stage_and_merge(
+    success, nchunks, nrows, stage_table = write_stage_and_merge_chats(
         sf_cfg,
         results_df=results_df,
         result_db=RESULT_DB,
@@ -229,6 +233,85 @@ async def run_predict() -> None:
     print(json.dumps(metrics, indent=2))
 
 
+# PREDICT for Calls
+async def run_predict_calls() -> None:
+    _setup_logging(PROJECT_ROOT)
+
+    # Inputs (calls)
+    SOURCE_DB = _env("SOURCE_DB", "DEV_MT_BIG_BETS_DB")
+    SOURCE_SCHEMA = _env("SOURCE_SCHEMA", "POC")
+    SOURCE_TABLE = _env("CALL_SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V2")
+    ID_COL = _env("CALL_ID_COL", "CALL_ID")
+    TEXT_COL = _env("CALL_TEXT_COL", "DIARIZED_TRANSCRIPT_TEXT")
+
+    # Outputs (calls)
+    RESULT_DB = _env("CALL_RESULT_DB", SOURCE_DB)
+    RESULT_SCHEMA = _env("CALL_RESULT_SCHEMA", SOURCE_SCHEMA)
+    RESULT_TABLE = _env("CALL_RESULT_TABLE", "CALL_ANALYSIS_TAXONOMY_V1")
+
+    WHERE_CLAUSE = _env("WHERE_CLAUSE_CALLS", "WHERE DIARIZED_TRANSCRIPT_TEXT IS NOT NULL")
+    MAX_ROWS = _int_env("MAX_ROWS", 20)
+
+    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 1024)
+    USE_JSON_MODE = _bool_env("USE_JSON_MODE", True)
+
+    sf_cfg = _build_snowflake_cfg(source_db=SOURCE_DB, source_schema=SOURCE_SCHEMA)
+    client, deployment = _build_aoai_client()
+
+    print("\n[main] Reading CALL transcript rows from Snowflake...")
+    src_df = load_transcripts(
+        sf_cfg,
+        source_db=SOURCE_DB,
+        source_schema=SOURCE_SCHEMA,
+        source_table=SOURCE_TABLE,
+        id_col=ID_COL,
+        text_col=TEXT_COL,
+        where_clause=WHERE_CLAUSE,
+        limit=MAX_ROWS,
+    )
+    print(f"[main] Loaded {len(src_df)} call rows")
+    if src_df.empty:
+        print("[main] No calls to process. Exiting.")
+        return
+
+    rows = src_df.to_dict(orient="records")
+    print(
+        f"\n[main] Classifying {len(rows)} transcripts "
+        f"(deployment={deployment}, max_tokens={MAX_COMPLETION_TOKENS}, json_mode={USE_JSON_MODE})"
+    )
+    results_df = await process_batch_calls(
+        client=client,
+        deployment=deployment,
+        rows=rows,
+        id_col=ID_COL,
+        text_col=TEXT_COL,
+        max_completion_tokens=MAX_COMPLETION_TOKENS,
+        use_json_mode=USE_JSON_MODE,
+    )
+
+    # Rename output ID column to CALL_ID for call tables
+    # if "CHAT_TRANSCRIPT_NAME" in results_df.columns:
+    #     results_df = results_df.rename(columns={"CHAT_TRANSCRIPT_NAME": "CALL_ID"})
+
+    if "ANALYZED_AT" in results_df.columns:
+        results_df["ANALYZED_AT"] = pd.to_datetime(results_df["ANALYZED_AT"], errors="coerce").dt.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+    print(f"\n[main] Writing CALL results to: {RESULT_DB}.{RESULT_SCHEMA}.{RESULT_TABLE}")
+    success, nchunks, nrows, stage_table = write_stage_and_merge_calls(
+        sf_cfg,
+        results_df=results_df,
+        result_db=RESULT_DB,
+        result_schema=RESULT_SCHEMA,
+        result_table=RESULT_TABLE,
+        id_col="CALL_ID",
+        drop_stage=True,
+    )
+    print(f"[main] CALL write/merge done (stage={stage_table}, success={success}, rows={nrows})")
+
+
+
 async def run_grade() -> None:
     _setup_logging(PROJECT_ROOT)
 
@@ -248,7 +331,7 @@ async def run_grade() -> None:
     # Grade output table
     GRADE_DB = _env("GRADE_DB", PRED_DB)
     GRADE_SCHEMA = _env("GRADE_SCHEMA", PRED_SCHEMA)
-    GRADE_TABLE = _env("GRADE_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_GRADE")
+    GRADE_TABLE = _env("GRADE_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_GRADE_TEST")
 
     LIMIT = _int_env("GRADE_LIMIT", 0)
 
@@ -342,8 +425,10 @@ async def run_grade() -> None:
 # ----------------------------
 async def main() -> None:
     args = _parse_args()
-    if args.mode == "predict":
-        await run_predict()
+    if args.mode == "predict_chats":
+        await run_predict_chats()
+    elif args.mode == "predict_calls":
+        await run_predict_calls()
     elif args.mode == "grade":
         await run_grade()
     else:

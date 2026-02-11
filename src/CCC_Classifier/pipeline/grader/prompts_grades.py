@@ -66,6 +66,8 @@ def _grading_rules_block() -> str:
         "- If score=0.5 (Partial) or score=0 (Incorrect): suggested_label MUST be NON-EMPTY.\n"
         "  Prefer selecting suggested_label from the ALLOWED LABELS list.\n"
         "  Only use free-text if NONE of the allowed labels reasonably fit the transcript.\n\n"
+        "  If suggested_label is free text, keep it short, noun phrase, no punctuation, no explanation.\n"
+        "  If multiple allowed labels fit, prefer the most specific one that best explains the customer's primary intent.\n"
         "EXAMPLES (illustrative):\n"
         "Example 1 (Incorrect -> choose allowed label):\n"
         "- Transcript: user cannot reset password / cannot log in.\n"
@@ -123,6 +125,10 @@ def system_prompt_grade_contact_type() -> str:
 def system_prompt_grade_domain() -> str:
     return (
         "You are an expert evaluator grading a classifier's predicted DOMAIN.\n"
+        "Hierarchy behavior:\n"
+        "- If DOMAIN context is provided, first judge the predicted SUBDOMAIN within that DOMAIN.\n"
+        "- If verdict is Partial/Incorrect, you may suggest a better label from the full Allowed Labels list.\n"
+        "- Use free-text only if no allowed label fits.\n"
         + _grading_rules_block()
         + _json_rule_block()
     )
@@ -131,6 +137,11 @@ def system_prompt_grade_domain() -> str:
 def system_prompt_grade_subdomain() -> str:
     return (
         "You are an expert evaluator grading a classifier's predicted SUBDOMAIN.\n"
+        "Hierarchy behavior:\n"
+        "- If DOMAIN context is provided, first judge the predicted SUBDOMAIN within that DOMAIN.\n"
+        "- If verdict is Partial/Incorrect, you may suggest a better label from the full Allowed Labels list.\n"
+        "- Use free-text only if no allowed label fits.\n"
+        "- Do not suggest a subdomain that contradicts the predicted DOMAIN context unless the domain itself is incorrect."
         + _grading_rules_block()
         + _json_rule_block()
     )
@@ -139,6 +150,11 @@ def system_prompt_grade_subdomain() -> str:
 def system_prompt_grade_root_cause() -> str:
     return (
         "You are an expert evaluator grading a classifier's predicted ROOT_CAUSE.\n"
+        "Hierarchy behavior:\n"
+        "- If SUBDOMAIN context is provided, first judge the predicted ROOT_CAUSE within that SUBDOMAIN.\n"
+        "- If verdict is Partial/Incorrect, you may suggest a better label from the full Allowed Labels list.\n"
+        "- Use free-text only if no allowed label fits.\n"
+        "- Do not suggest a root cause that contradicts the predicted SUBDOMAIN context unless the subdomain itself is incorrect."
         + _grading_rules_block()
         + _json_rule_block()
     )
@@ -147,6 +163,9 @@ def system_prompt_grade_root_cause() -> str:
 def system_prompt_grade_contact_driver() -> str:
     return (
         "You are an expert evaluator grading a classifier's predicted CONTACT_DRIVER.\n"
+        "Definition of CONTACT_DRIVER:\n"
+        "- A contact_driver is the earliest explicit customer-observed stimulus or need that triggered contacting support.\n"
+        "- It is NOT the detailed root cause or the requested action.\n"
         + _grading_rules_block()
         + _json_rule_block()
     )
