@@ -38,12 +38,15 @@ if str(SRC_PATH) not in sys.path:
 # ----------------------------
 from CCC_Classifier.pipeline.batch import process_batch_chats
 from CCC_Classifier.pipeline.batch import process_batch_calls
-from CCC_Classifier.pipeline.grader.batch_grades import process_grade_batch
+from CCC_Classifier.pipeline.grader.batch_grades import process_grade_batch_chats
+from CCC_Classifier.pipeline.grader.batch_grades import process_grade_batch_calls
 from CCC_Classifier.io.snowflake import (
     load_transcripts,
     write_stage_and_merge_chats,
-    load_predictions_for_grading_join_source,
-    write_stage_and_merge_grades,
+    load_predictions_for_grading_join_source_chats,
+    load_predictions_for_grading_join_source_calls,
+    write_stage_and_merge_grades_chats,
+    write_stage_and_merge_grades_calls,
     new_grader_run_id,
     write_stage_and_merge_calls,
 )
@@ -88,7 +91,7 @@ def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="CCC Classifier")
     p.add_argument(
         "--mode",
-        choices=("predict_chats", "grade","predict_calls"),
+        choices=("predict_chats", "grade_chats","predict_calls","grade_calls"),
         default="predict_chats",
         help="Run mode. 'predict_chats' runs classification for chats; 'grade' runs pass-2 grading;  'predict_calls' runs on call transcripts.",
     )
@@ -240,7 +243,7 @@ async def run_predict_calls() -> None:
     # Inputs (calls)
     SOURCE_DB = _env("SOURCE_DB", "DEV_MT_BIG_BETS_DB")
     SOURCE_SCHEMA = _env("SOURCE_SCHEMA", "POC")
-    SOURCE_TABLE = _env("CALL_SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V2")
+    SOURCE_TABLE = _env("CALL_SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V3")
     ID_COL = _env("CALL_ID_COL", "CALL_ID")
     TEXT_COL = _env("CALL_TEXT_COL", "DIARIZED_TRANSCRIPT_TEXT")
 
@@ -311,8 +314,8 @@ async def run_predict_calls() -> None:
     print(f"[main] CALL write/merge done (stage={stage_table}, success={success}, rows={nrows})")
 
 
-
-async def run_grade() -> None:
+# Grader for Chats
+async def run_grade_chats() -> None:
     _setup_logging(PROJECT_ROOT)
 
     # Prediction table location
@@ -331,7 +334,7 @@ async def run_grade() -> None:
     # Grade output table
     GRADE_DB = _env("GRADE_DB", PRED_DB)
     GRADE_SCHEMA = _env("GRADE_SCHEMA", PRED_SCHEMA)
-    GRADE_TABLE = _env("GRADE_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_GRADE_TEST")
+    GRADE_TABLE = _env("GRADE_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_GRADE_CHATS")
 
     LIMIT = _int_env("GRADE_LIMIT", 0)
 
@@ -342,7 +345,7 @@ async def run_grade() -> None:
         f"{PRED_DB}.{PRED_SCHEMA}.{PRED_TABLE} ↔ {SOURCE_DB}.{SOURCE_SCHEMA}.{SOURCE_TABLE}"
     )
     t0 = time.perf_counter()
-    pred_df = load_predictions_for_grading_join_source(
+    pred_df = load_predictions_for_grading_join_source_chats(
         sf_cfg,
         pred_db=PRED_DB,
         pred_schema=PRED_SCHEMA,
@@ -364,7 +367,7 @@ async def run_grade() -> None:
     graded_at_str = pd.Timestamp.utcnow().tz_localize(None).strftime("%Y-%m-%d %H:%M:%S")
     sf_cfg = _build_snowflake_cfg(source_db=PRED_DB, source_schema=PRED_SCHEMA)
     client, deployment = _build_aoai_client()
-    grades_df = await process_grade_batch(
+    grades_df = await process_grade_batch_chats(
         pred_df,
         client=client,
         deployment=deployment,
@@ -374,40 +377,10 @@ async def run_grade() -> None:
         text_col=TEXT_COL,
         max_completion_tokens=MAX_COMPLETION_TOKENS,
     )
-
-    # grades_df = pd.DataFrame(
-    #     {
-    #         "CHAT_TRANSCRIPT_NAME": pred_df["CHAT_TRANSCRIPT_NAME"].astype(str),
-    #         "GRADER_RUN_ID": grader_run_id,
-    #         "GRADED_AT": graded_at_str,
-
-    #         "CONTACT_TYPE_VERDICT": "Correct",
-    #         "CONTACT_TYPE_SCORE": 1.0,
-    #         "CONTACT_TYPE_SUGGESTED_LABEL": pred_df["CONTACT_TYPE"].astype(str),
-
-    #         "DOMAIN_VERDICT": "Correct",
-    #         "DOMAIN_SCORE": 1.0,
-    #         "DOMAIN_SUGGESTED_LABEL": pred_df["DOMAIN"].astype(str),
-
-    #         "SUBDOMAIN_VERDICT": "Correct",
-    #         "SUBDOMAIN_SCORE": 1.0,
-    #         "SUBDOMAIN_SUGGESTED_LABEL": pred_df["SUBDOMAIN"].astype(str),
-
-    #         "ROOT_CAUSE_VERDICT": "Correct",
-    #         "ROOT_CAUSE_SCORE": 1.0,
-    #         "ROOT_CAUSE_SUGGESTED_LABEL": pred_df["ROOT_CAUSE"].astype(str),
-
-    #         "CONTACT_DRIVER_VERDICT": "Correct",
-    #         "CONTACT_DRIVER_SCORE": 1.0,
-    #         "CONTACT_DRIVER_SUGGESTED_LABEL": pred_df["CONTACT_DRIVER"].astype(str),
-
-    #         "OVERALL_SCORE": 1.0,
-    #     }
-    # )
     print("[main] grades_df dtypes:\n", grades_df.dtypes)
     print(f"\n[main] Writing grades to: {GRADE_DB}.{GRADE_SCHEMA}.{GRADE_TABLE}")
     t1 = time.perf_counter()
-    success, nchunks, nrows, stage_table = write_stage_and_merge_grades(
+    success, nchunks, nrows, stage_table = write_stage_and_merge_grades_chats(
         sf_cfg,
         grades_df=grades_df,
         grade_db=GRADE_DB,
@@ -420,6 +393,89 @@ async def run_grade() -> None:
         f"(stage={stage_table}, success={success}, chunks={nchunks}, rows={nrows}, grader_run_id={grader_run_id})"
     )
 
+
+
+# Grader for Calls
+async def run_grade_calls() -> None:
+    _setup_logging(PROJECT_ROOT)
+
+    # # Prediction table location
+    PRED_DB = _env("PRED_DB", _env("RESULT_DB", "DEV_MT_BIG_BETS_DB"))
+    PRED_SCHEMA = _env("PRED_SCHEMA", _env("RESULT_SCHEMA", "POC"))
+    PRED_TABLE = _env("PRED_TABLE", _env("RESULT_TABLE", "CALL_ANALYSIS_TAXONOMY_V1"))
+
+    # Source transcript table location (for BODY)
+    SOURCE_DB = _env("SOURCE_DB", PRED_DB)
+    SOURCE_SCHEMA = _env("SOURCE_SCHEMA", PRED_SCHEMA)
+    SOURCE_TABLE = _env("SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V3")
+    MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 1024)
+    ID_COL = _env("ID_COL", "CALL_ID")
+    TEXT_COL = _env("TEXT_COL", "DIARIZED_TRANSCRIPT_TEXT")
+
+    # Grade output table
+    GRADE_DB = _env("GRADE_DB", PRED_DB)
+    GRADE_SCHEMA = _env("GRADE_SCHEMA", PRED_SCHEMA)
+    GRADE_TABLE = _env("GRADE_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_GRADE_CALLS")
+
+    LIMIT = _int_env("GRADE_LIMIT", 10)
+
+    sf_cfg = _build_snowflake_cfg(source_db=PRED_DB, source_schema=PRED_SCHEMA)
+
+    print(
+        f"\n[main] Loading prediction rows for grading (INNER JOIN source): "
+        f"{PRED_DB}.{PRED_SCHEMA}.{PRED_TABLE} ↔ {SOURCE_DB}.{SOURCE_SCHEMA}.{SOURCE_TABLE}"
+    )
+    t0 = time.perf_counter()
+    pred_df = load_predictions_for_grading_join_source_calls(
+        sf_cfg,
+        pred_db=PRED_DB,
+        pred_schema=PRED_SCHEMA,
+        pred_table=PRED_TABLE,
+        source_db=SOURCE_DB,
+        source_schema=SOURCE_SCHEMA,
+        source_table=SOURCE_TABLE,
+        id_col=ID_COL,
+        text_col=TEXT_COL,
+        limit=LIMIT,
+    )
+    print(f"[main] Loaded {len(pred_df)} rows in {round(time.perf_counter() - t0, 2)}s")
+    if pred_df.empty:
+        print("[main] No prediction rows found to grade. Exiting.")
+        return
+
+    grader_run_id = new_grader_run_id()
+    # Build stub grading output (plumbing validation)
+    graded_at_str = pd.Timestamp.utcnow().tz_localize(None).strftime("%Y-%m-%d %H:%M:%S")
+    sf_cfg = _build_snowflake_cfg(source_db=PRED_DB, source_schema=PRED_SCHEMA)
+    client, deployment = _build_aoai_client()
+    grades_df = await process_grade_batch_calls(
+        pred_df,
+        client=client,
+        deployment=deployment,
+        grader_run_id=grader_run_id,
+        graded_at=graded_at_str,
+        id_col=ID_COL,
+        text_col=TEXT_COL,
+        max_completion_tokens=MAX_COMPLETION_TOKENS,
+    )
+
+    print("[main] grades_df dtypes:\n", grades_df.dtypes)
+    print(f"\n[main] Writing grades to: {GRADE_DB}.{GRADE_SCHEMA}.{GRADE_TABLE}")
+    t1 = time.perf_counter()
+    success, nchunks, nrows, stage_table = write_stage_and_merge_grades_calls(
+        sf_cfg,
+        grades_df=grades_df,
+        grade_db=GRADE_DB,
+        grade_schema=GRADE_SCHEMA,
+        grade_table=GRADE_TABLE,
+        drop_stage=True,
+    )
+    print(
+        f"[main] Grade write/merge done in {round(time.perf_counter() - t1, 2)}s "
+        f"(stage={stage_table}, success={success}, chunks={nchunks}, rows={nrows}, grader_run_id={grader_run_id})"
+    )
+
+
 # ----------------------------
 # Entry
 # ----------------------------
@@ -429,8 +485,10 @@ async def main() -> None:
         await run_predict_chats()
     elif args.mode == "predict_calls":
         await run_predict_calls()
-    elif args.mode == "grade":
-        await run_grade()
+    elif args.mode == "grade_chats":
+        await run_grade_chats()
+    elif args.mode == "grade_calls":
+        await run_grade_calls()
     else:
         raise RuntimeError(f"Unknown mode: {args.mode}")
 
