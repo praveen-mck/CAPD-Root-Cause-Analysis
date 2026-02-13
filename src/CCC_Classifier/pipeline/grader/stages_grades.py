@@ -22,7 +22,7 @@ from __future__ import annotations
 import json
 import os
 from typing import Any, Dict
-
+import logging
 from CCC_Classifier.llm.client import send_chat_request
 from CCC_Classifier.llm.parsing import extract_content_and_usage, get_json_field, safe_parse_json
 from CCC_Classifier.pipeline.grader.prompts_grades import (
@@ -38,6 +38,7 @@ from CCC_Classifier.pipeline.grader.prompts_grades import (
     user_prompt_grade_subdomain,
 )
 
+logger = logging.getLogger(__name__)
 
 _ALLOWED_VERDICTS = {"Correct", "Partial", "Incorrect"}
 
@@ -82,7 +83,6 @@ async def _grade_label(
     max_completion_tokens: int,
     use_json_mode: bool,
 ) -> Dict[str, Any]:
-
     resp = await send_chat_request(
         client=client,
         deployment=deployment,
@@ -92,8 +92,6 @@ async def _grade_label(
         use_json_mode=use_json_mode,
     )
     content, usage, finish = extract_content_and_usage(resp)
-
-
     # print("\n" + "=" * 100)
     # print("[GRADER DEBUG] raw_model_content:\n" + (content or ""))
     # print("-" * 100)

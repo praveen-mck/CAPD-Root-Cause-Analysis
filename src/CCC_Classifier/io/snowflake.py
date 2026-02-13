@@ -516,24 +516,24 @@ def load_predictions_for_grading_join_source_calls(
     source_db: str,
     source_schema: str,
     source_table: str,
-    id_col: str = "COL_ID",
-    text_col: str = "DIARIZED_TRANSCRIPT_NAME",
+    id_col: str = "CALL_ID",
+    text_col: str = "DIARIZED_TRANSCRIPT_TEXT",
     limit: int = 0,
 ) -> pd.DataFrame:
     """
     Load rows for grading by joining prediction table to source transcripts table (INNER JOIN).
 
     Returns columns:
-      - COL_ID
-      - DIARIZED_TRANSCRIPT_NAME (from source table)
+      - CALL_ID
+      - DIARIZED_TRANSCRIPT_TEXT (from source table)
       - CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER (from prediction table)
     """
     lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
 
     sql = f"""
     SELECT
-      p."{id_col}" AS "COL_ID",
-      s."{text_col}" AS "DIARIZED_TRANSCRIPT_NAME",
+      p."{id_col}" AS "CALL_ID",
+      s."{text_col}" AS "DIARIZED_TRANSCRIPT_TEXT",
       p."CONTACT_TYPE",
       p."DOMAIN",
       p."SUBDOMAIN",

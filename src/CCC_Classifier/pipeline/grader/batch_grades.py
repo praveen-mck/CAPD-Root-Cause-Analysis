@@ -196,7 +196,17 @@ async def process_grade_batch_calls(
       OVERALL_SCORE
     """
     rows = _to_rows(pred_df_or_rows)
-
+    if rows:
+        sample = rows[0]
+        logger.info(
+            "grade_calls_input sample_keys=%s id_col=%s text_col=%s id=%r text_len=%s preds=%s",
+            list(sample.keys()),
+            id_col,
+            text_col,
+            sample.get(id_col),
+            len((sample.get(text_col) or "") if isinstance(sample.get(text_col), str) else str(sample.get(text_col) or "")),
+            {f: sample.get(f) for f in fields},
+        )
     if max_concurrent is None:
         max_concurrent = _int_env("MAX_CONCURRENT_GRADE", 8)
     max_concurrent = max(1, int(max_concurrent))

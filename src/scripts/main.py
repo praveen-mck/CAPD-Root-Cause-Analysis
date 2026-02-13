@@ -32,7 +32,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]  # scripts/main.py -> project
 SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
-
+logger = logging.getLogger(__name__)
 # ----------------------------
 # Imports from package
 # ----------------------------
@@ -150,7 +150,7 @@ async def run_predict_chats() -> None:
     # Outputs
     RESULT_DB = _env("RESULT_DB", SOURCE_DB)
     RESULT_SCHEMA = _env("RESULT_SCHEMA", SOURCE_SCHEMA)
-    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD_TEST")
+    RESULT_TABLE = _env("RESULT_TABLE", "CHAT_ANALYSIS_TAXONOMY_V9_CD")
 
     WHERE_CLAUSE = _env("WHERE_CLAUSE", "WHERE BODY IS NOT NULL")
     MAX_ROWS = _int_env("MAX_ROWS", 2000)
@@ -243,7 +243,7 @@ async def run_predict_calls() -> None:
     # Inputs (calls)
     SOURCE_DB = _env("SOURCE_DB", "DEV_MT_BIG_BETS_DB")
     SOURCE_SCHEMA = _env("SOURCE_SCHEMA", "POC")
-    SOURCE_TABLE = _env("CALL_SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V3")
+    SOURCE_TABLE = _env("CALL_SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V4")
     ID_COL = _env("CALL_ID_COL", "CALL_ID")
     TEXT_COL = _env("CALL_TEXT_COL", "DIARIZED_TRANSCRIPT_TEXT")
 
@@ -407,7 +407,7 @@ async def run_grade_calls() -> None:
     # Source transcript table location (for BODY)
     SOURCE_DB = _env("SOURCE_DB", PRED_DB)
     SOURCE_SCHEMA = _env("SOURCE_SCHEMA", PRED_SCHEMA)
-    SOURCE_TABLE = _env("SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V3")
+    SOURCE_TABLE = _env("SOURCE_TABLE", "RCA_CALLS_TRANSCRIPTS_SAMPLE_V4")
     MAX_COMPLETION_TOKENS = _int_env("MAX_COMPLETION_TOKENS", 1024)
     ID_COL = _env("ID_COL", "CALL_ID")
     TEXT_COL = _env("TEXT_COL", "DIARIZED_TRANSCRIPT_TEXT")
@@ -437,6 +437,12 @@ async def run_grade_calls() -> None:
         id_col=ID_COL,
         text_col=TEXT_COL,
         limit=LIMIT,
+    )
+    logger.info("[main] pred_df columns: %s", list(pred_df.columns))
+    logger.info(
+        "[main] first row text preview (%s): %s",
+        TEXT_COL,
+        (str(pred_df.iloc[0].get(TEXT_COL, ""))[:200] if len(pred_df) else "<empty df>"),
     )
     print(f"[main] Loaded {len(pred_df)} rows in {round(time.perf_counter() - t0, 2)}s")
     if pred_df.empty:
