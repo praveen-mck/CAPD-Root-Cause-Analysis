@@ -36,7 +36,7 @@ def _int_env(name: str, default: int) -> int:
         return default
 
 
-async def process_batch(
+async def process_batch_chats(
     *,
     client: Any,
     deployment: str,
@@ -132,5 +132,105 @@ async def process_batch(
     # If something upstream accidentally used a different name, enforce it here.
     if "CHAT_TRANSCRIPT_NAME" not in df.columns and id_col in df.columns:
         df = df.rename(columns={id_col: "CHAT_TRANSCRIPT_NAME"})
+
+    return df
+
+
+async def process_batch_calls(
+    *,
+    client: Any,
+    deployment: str,
+    rows: List[Dict[str, Any]],
+    id_col: str,
+    text_col: str,
+    max_completion_tokens: int = 512,
+    use_json_mode: bool = True,
+) -> pd.DataFrame:
+    """
+    Process many transcripts concurrently.
+
+    Args:
+        client: AsyncAzureOpenAI client
+        deployment: Azure OpenAI deployment name
+        rows: list of dicts (each dict is a row from input data)
+        id_col: column name for transcript identifier in `rows`
+        text_col: column name for transcript text in `rows`
+        max_completion_tokens: max tokens per stage completion (passed to orchestrator/stages)
+        use_json_mode: enforce JSON outputs at the API layer
+
+    Returns:
+        DataFrame with columns:
+          CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE,
+          CONTACT_DRIVER, SHORT_SUMMARY, DETAILED_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
+          optional: _DURATION_MS
+    """
+    max_concurrent = _int_env("MAX_CONCURRENT", 8)
+    semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def _process_one(row: Dict[str, Any]) -> Dict[str, Any]:
+        async with semaphore:
+            start = time.perf_counter()
+
+            rid = row.get(id_col)
+            transcript = (row.get(text_col) or "")
+            transcript = transcript if isinstance(transcript, str) else str(transcript)
+            try:
+                result = await analyze_transcript(
+                    client=client,
+                    deployment=deployment,
+                    transcript_text=transcript,
+                    max_completion_tokens=max_completion_tokens,
+                    use_json_mode=use_json_mode,
+                )
+            except Exception as ex:
+                preview = transcript[:300].replace("\n", " ")
+                logger.exception(
+                    "Error processing row rid=%r transcript_len=%s preview=%r",
+                    rid,
+                    len(transcript),
+                    preview,
+                )
+                print(f"Error processing row {rid}: {ex}")
+                # Very defensive fallback (should be rare because orchestrator already has a fallback)
+                result = {
+                    "contact_type": "Unclear Contact",
+                    "domain": "Other: Unspecified",
+                    "subdomain": "Other: Unspecified",
+                    "root_cause": "Other: Unspecified",
+                    "contact_driver": "Other: Unspecified",
+                    "SHORT_SUMMARY": "Context Unspecified",
+                    "DETAILED_SUMMARY": "Context Unspecified",
+                    "confidence": 0.0,
+                    "IS_NO_INPUT": 0,
+                }
+
+            elapsed_ms = (time.perf_counter() - start) * 1000.0
+
+            # Shape into Snowflake-friendly schema (uppercase column names)
+            out = {
+                "CALL_ID": rid,
+                "CONTACT_TYPE": result.get("contact_type", "Unclear Contact"),
+                "DOMAIN": result.get("domain", "Other: Unspecified"),
+                "SUBDOMAIN": result.get("subdomain", "Other: Unspecified"),
+                "ROOT_CAUSE": result.get("root_cause", "Other: Unspecified"),
+                "CONTACT_DRIVER": result.get("contact_driver", "Other: Unspecified"),
+                "SHORT_SUMMARY": result.get("SHORT_SUMMARY", "Context Unspecified"),
+                "DETAILED_SUMMARY": result.get("DETAILED_SUMMARY", "Context Unspecified"),
+                "CONFIDENCE": float(result.get("confidence", 0.0) or 0.0),
+                "ANALYZED_AT": dt.datetime.utcnow(),
+                "IS_NO_INPUT": int(result.get("IS_NO_INPUT", 0) or 0),
+                "_DURATION_MS": round(elapsed_ms, 1),
+            }
+            return out
+
+    tasks = [_process_one(r) for r in rows]
+    results = await asyncio.gather(*tasks)
+
+    df = pd.DataFrame(results)
+
+    # Keep "as-is" behavior: output ID is always CALL_ID
+    # If something upstream accidentally used a different name, enforce it here.
+    if "CALL_ID" not in df.columns and id_col in df.columns:
+        df = df.rename(columns={id_col: "CALL_ID"})
 
     return df

@@ -10,7 +10,8 @@ Implements:
 - extract_data_from_snowflake (read into pandas)
 - execute_snowflake_multi_query (multi-statement exec)
 - write_pandas_create_or_replace_stage (Create/Replace stage table and write pandas df)
-- merge_results_into_table (MERGE stage into target)
+- merge_chats_results_into_table (MERGE stage into target)
+- merge_calls_results_into_table (MERGE stage into target)
 
 Expected cfg keys (as used in your scripts/main.py):
   cfg = {
@@ -32,6 +33,7 @@ Optional environment variable:
 from __future__ import annotations
 
 import os
+import uuid
 from typing import Any, Dict, Tuple
 
 import pandas as pd
@@ -225,8 +227,163 @@ def write_pandas_create_or_replace_stage(
     finally:
         conn.close()
 
+def load_transcripts(
+    cfg: Dict[str, Any],
+    *,
+    source_db: str,
+    source_schema: str,
+    source_table: str,
+    id_col: str,
+    text_col: str,
+    where_clause: str = "",
+    limit: int = 0,
+) -> pd.DataFrame:
+    """
+    Load (id_col, text_col) rows from Snowflake.
+    where_clause may be "" or start with "WHERE ...".
+    """
+    where = f" {where_clause}" if where_clause.strip() else ""
+    lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
+    sql = f"""
+    SELECT {id_col}, {text_col}
+    FROM {source_db}.{source_schema}.{source_table}
+    {where}{lim};
+    """
+    return extract_data_from_snowflake(cfg, sql)
 
-def merge_results_into_table(
+
+# CHATS - Create Results Table
+def ensure_chats_results_table_exists(cfg: Dict[str, Any], *, result_db: str, result_schema: str, result_table: str) -> None:
+    """
+    Create base results table (Pass-1 columns). Pass-2 columns are added later by merge_chats_results_into_table.
+    """
+    sql = f"""
+    CREATE TABLE IF NOT EXISTS "{result_db}"."{result_schema}"."{result_table}" (
+      "CHAT_TRANSCRIPT_NAME" STRING,
+      "CONTACT_TYPE" STRING,
+      "DOMAIN" STRING,
+      "SUBDOMAIN" STRING,
+      "ROOT_CAUSE" STRING,
+      "CONTACT_DRIVER" STRING,
+      "SHORT_SUMMARY" STRING,
+      "DETAILED_SUMMARY" STRING,
+      "CONFIDENCE" FLOAT,
+      "ANALYZED_AT" TIMESTAMP_NTZ,
+      "IS_NO_INPUT" NUMBER(1,0)
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+
+# CALLS - Create Results Table
+def ensure_call_results_table_exists(cfg: Dict[str, Any], *, result_db: str, result_schema: str, result_table: str) -> None:
+    """
+    Create base CALL results table (Pass-1 columns).
+    Same shape as chat results, but keyed by CALL_ID.
+    """
+    sql = f"""
+    CREATE TABLE IF NOT EXISTS "{result_db}"."{result_schema}"."{result_table}" (
+      "CALL_ID" STRING,
+      "CONTACT_TYPE" STRING,
+      "DOMAIN" STRING,
+      "SUBDOMAIN" STRING,
+      "ROOT_CAUSE" STRING,
+      "CONTACT_DRIVER" STRING,
+      "SHORT_SUMMARY" STRING,
+      "DETAILED_SUMMARY" STRING,
+      "CONFIDENCE" FLOAT,
+      "ANALYZED_AT" TIMESTAMP_NTZ,
+      "IS_NO_INPUT" NUMBER(1,0)
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+
+def drop_table_if_exists(cfg: Dict[str, Any], *, db: str, schema: str, table: str) -> None:
+    sql = f'DROP TABLE IF EXISTS "{db}"."{schema}"."{table}";'
+    execute_snowflake_multi_query(cfg, sql)
+
+
+# CHATS - Write results to stage table and merge
+def write_stage_and_merge_chats(
+    cfg: Dict[str, Any],
+    *,
+    results_df: pd.DataFrame,
+    result_db: str,
+    result_schema: str,
+    result_table: str,
+    id_col: str,
+    stage_suffix: str = "_STAGE",
+    drop_stage: bool = True,
+) -> Tuple[bool, int, int, str]:
+    """
+    Write results_df to a stage table, MERGE into result_table, optionally drop stage.
+    Returns (success, nchunks, nrows, stage_table_name).
+    """
+    stage_table = f"{result_table}{stage_suffix}"
+
+    out_cfg = dict(cfg)
+    out_cfg["database"] = result_db
+    out_cfg["schema"] = result_schema
+
+    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, results_df, stage_table)
+
+    ensure_chats_results_table_exists(out_cfg, result_db=result_db, result_schema=result_schema, result_table=result_table)
+
+    merge_chats_results_into_table(
+        cfg=out_cfg,
+        target_table=result_table,
+        stage_table=stage_table,
+        id_col=id_col,
+    )
+
+    if drop_stage:
+        drop_table_if_exists(out_cfg, db=result_db, schema=result_schema, table=stage_table)
+
+    return success, nchunks, nrows, stage_table
+
+
+# CALLS - Write results to stage table and merge
+def write_stage_and_merge_calls(
+    cfg: Dict[str, Any],
+    *,
+    results_df: pd.DataFrame,
+    result_db: str,
+    result_schema: str,
+    result_table: str,
+    id_col: str = "CALL_ID",
+    stage_suffix: str = "_STAGE",
+    drop_stage: bool = True,
+) -> Tuple[bool, int, int, str]:
+    """
+    Write call results_df to stage table, MERGE into call results table keyed by CALL_ID.
+    Returns (success, nchunks, nrows, stage_table_name).
+    """
+    stage_table = f"{result_table}{stage_suffix}"
+
+    out_cfg = dict(cfg)
+    out_cfg["database"] = result_db
+    out_cfg["schema"] = result_schema
+
+    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, results_df, stage_table)
+
+    ensure_call_results_table_exists(out_cfg, result_db=result_db, result_schema=result_schema, result_table=result_table)
+
+    merge_call_results_into_table(
+        cfg=out_cfg,
+        target_table=result_table,
+        stage_table=stage_table,
+        id_col=id_col,
+    )
+
+    if drop_stage:
+        drop_table_if_exists(out_cfg, db=result_db, schema=result_schema, table=stage_table)
+
+    return success, nchunks, nrows, stage_table
+
+
+# CHATS - Merge results into existing table
+def merge_chats_results_into_table(
     cfg: Dict[str, Any],
     target_table: str,
     stage_table: str,
@@ -271,3 +428,506 @@ def merge_results_into_table(
     """
     print("[Snowflake] Merging stage -> target...\n", sql.strip())
     execute_snowflake_multi_query(cfg, sql)
+
+# CALLS - Merge results into existing table
+def merge_call_results_into_table(
+    cfg: Dict[str, Any],
+    target_table: str,
+    stage_table: str,
+    id_col: str = "CALL_ID",
+) -> None:
+    """
+    Merge call results from stage_table into target_table using CALL_ID.
+    """
+    sql = f"""
+    MERGE INTO "{cfg['database']}"."{cfg['schema']}"."{target_table}" TGT
+    USING "{cfg['database']}"."{cfg['schema']}"."{stage_table}" SRC
+      ON TGT."CALL_ID" = SRC."CALL_ID"
+    WHEN MATCHED THEN UPDATE SET
+      TGT."CONTACT_TYPE"     = SRC."CONTACT_TYPE",
+      TGT."DOMAIN"           = SRC."DOMAIN",
+      TGT."SUBDOMAIN"        = SRC."SUBDOMAIN",
+      TGT."ROOT_CAUSE"       = SRC."ROOT_CAUSE",
+      TGT."CONTACT_DRIVER"   = SRC."CONTACT_DRIVER",
+      TGT."SHORT_SUMMARY"    = SRC."SHORT_SUMMARY",
+      TGT."DETAILED_SUMMARY" = SRC."DETAILED_SUMMARY",
+      TGT."CONFIDENCE"       = SRC."CONFIDENCE",
+      TGT."ANALYZED_AT"      = SRC."ANALYZED_AT",
+      TGT."IS_NO_INPUT"      = SRC."IS_NO_INPUT"
+    WHEN NOT MATCHED THEN INSERT (
+      "CALL_ID",
+      "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN", "ROOT_CAUSE",
+      "CONTACT_DRIVER", "SHORT_SUMMARY", "DETAILED_SUMMARY",
+      "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
+    ) VALUES (
+      SRC."CALL_ID",
+      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN", SRC."ROOT_CAUSE",
+      SRC."CONTACT_DRIVER", SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY",
+      SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+def load_predictions_for_grading_join_source_chats(
+    cfg: Dict[str, Any],
+    *,
+    pred_db: str,
+    pred_schema: str,
+    pred_table: str,
+    source_db: str,
+    source_schema: str,
+    source_table: str,
+    id_col: str = "CHAT_TRANSCRIPT_NAME",
+    text_col: str = "BODY",
+    limit: int = 0,
+) -> pd.DataFrame:
+    """
+    Load rows for grading by joining prediction table to source transcripts table (INNER JOIN).
+
+    Returns columns:
+      - CHAT_TRANSCRIPT_NAME
+      - BODY (from source table)
+      - CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER (from prediction table)
+    """
+    lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
+
+    sql = f"""
+    SELECT
+      p."{id_col}" AS "CHAT_TRANSCRIPT_NAME",
+      s."{text_col}" AS "BODY",
+      p."CONTACT_TYPE",
+      p."DOMAIN",
+      p."SUBDOMAIN",
+      p."ROOT_CAUSE",
+      p."CONTACT_DRIVER"
+    FROM "{pred_db}"."{pred_schema}"."{pred_table}" p
+    INNER JOIN "{source_db}"."{source_schema}"."{source_table}" s
+      ON p."{id_col}" = s."{id_col}"
+    {lim};
+    """
+    return extract_data_from_snowflake(cfg, sql)
+
+def load_predictions_for_grading_join_source_calls(
+    cfg: Dict[str, Any],
+    *,
+    pred_db: str,
+    pred_schema: str,
+    pred_table: str,
+    source_db: str,
+    source_schema: str,
+    source_table: str,
+    id_col: str = "CALL_ID",
+    text_col: str = "DIARIZED_TRANSCRIPT_TEXT",
+    limit: int = 0,
+) -> pd.DataFrame:
+    """
+    Load rows for grading by joining prediction table to source transcripts table (INNER JOIN).
+
+    Returns columns:
+      - CALL_ID
+      - DIARIZED_TRANSCRIPT_TEXT (from source table)
+      - CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER (from prediction table)
+    """
+    lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
+
+    sql = f"""
+    SELECT
+      p."{id_col}" AS "CALL_ID",
+      s."{text_col}" AS "DIARIZED_TRANSCRIPT_TEXT",
+      p."CONTACT_TYPE",
+      p."DOMAIN",
+      p."SUBDOMAIN",
+      p."ROOT_CAUSE",
+      p."CONTACT_DRIVER"
+    FROM "{pred_db}"."{pred_schema}"."{pred_table}" p
+    INNER JOIN "{source_db}"."{source_schema}"."{source_table}" s
+      ON p."{id_col}" = s."{id_col}"
+    {lim};
+    """
+    return extract_data_from_snowflake(cfg, sql)
+
+def ensure_grades_table_exists_chats(
+    cfg: Dict[str, Any],
+    *,
+    grade_db: str,
+    grade_schema: str,
+    grade_table: str,
+) -> None:
+    """
+    Create grading results table if missing.
+
+    Notes:
+    - Snowflake doesn't enforce PK in the same way as OLTP; we treat CHAT_TRANSCRIPT_NAME as merge key.
+    - Verdict is stored as STRING: 'Correct' | 'Partial' | 'Incorrect'
+    - Score is FLOAT: 0 | 0.5 | 1
+    """
+    sql = f"""
+    CREATE TABLE IF NOT EXISTS "{grade_db}"."{grade_schema}"."{grade_table}" (
+      "CHAT_TRANSCRIPT_NAME" STRING,
+
+      -- grade metadata
+      "GRADER_RUN_ID" STRING,
+      "GRADED_AT" TIMESTAMP_NTZ,
+
+      -- per-field grade outputs
+      "CONTACT_TYPE_VERDICT" STRING,
+      "CONTACT_TYPE_SCORE" FLOAT,
+      "CONTACT_TYPE_SUGGESTED_LABEL" STRING,
+
+      "DOMAIN_VERDICT" STRING,
+      "DOMAIN_SCORE" FLOAT,
+      "DOMAIN_SUGGESTED_LABEL" STRING,
+
+      "SUBDOMAIN_VERDICT" STRING,
+      "SUBDOMAIN_SCORE" FLOAT,
+      "SUBDOMAIN_SUGGESTED_LABEL" STRING,
+
+      "ROOT_CAUSE_VERDICT" STRING,
+      "ROOT_CAUSE_SCORE" FLOAT,
+      "ROOT_CAUSE_SUGGESTED_LABEL" STRING,
+
+      "CONTACT_DRIVER_VERDICT" STRING,
+      "CONTACT_DRIVER_SCORE" FLOAT,
+      "CONTACT_DRIVER_SUGGESTED_LABEL" STRING,
+
+      -- overall
+      "OVERALL_SCORE" FLOAT
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+
+def ensure_grades_table_exists_calls(
+    cfg: Dict[str, Any],
+    *,
+    grade_db: str,
+    grade_schema: str,
+    grade_table: str,
+) -> None:
+    """
+    Create grading results table if missing.
+
+    Notes:
+    - Snowflake doesn't enforce PK in the same way as OLTP; we treat CHAT_TRANSCRIPT_NAME as merge key.
+    - Verdict is stored as STRING: 'Correct' | 'Partial' | 'Incorrect'
+    - Score is FLOAT: 0 | 0.5 | 1
+    """
+    sql = f"""
+    CREATE TABLE IF NOT EXISTS "{grade_db}"."{grade_schema}"."{grade_table}" (
+      "CALL_ID" STRING,
+
+      -- grade metadata
+      "GRADER_RUN_ID" STRING,
+      "GRADED_AT" TIMESTAMP_NTZ,
+
+      -- per-field grade outputs
+      "CONTACT_TYPE_VERDICT" STRING,
+      "CONTACT_TYPE_SCORE" FLOAT,
+      "CONTACT_TYPE_SUGGESTED_LABEL" STRING,
+
+      "DOMAIN_VERDICT" STRING,
+      "DOMAIN_SCORE" FLOAT,
+      "DOMAIN_SUGGESTED_LABEL" STRING,
+
+      "SUBDOMAIN_VERDICT" STRING,
+      "SUBDOMAIN_SCORE" FLOAT,
+      "SUBDOMAIN_SUGGESTED_LABEL" STRING,
+
+      "ROOT_CAUSE_VERDICT" STRING,
+      "ROOT_CAUSE_SCORE" FLOAT,
+      "ROOT_CAUSE_SUGGESTED_LABEL" STRING,
+
+      "CONTACT_DRIVER_VERDICT" STRING,
+      "CONTACT_DRIVER_SCORE" FLOAT,
+      "CONTACT_DRIVER_SUGGESTED_LABEL" STRING,
+
+      -- overall
+      "OVERALL_SCORE" FLOAT
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+
+def write_stage_and_merge_grades_chats(
+    cfg: Dict[str, Any],
+    *,
+    grades_df: pd.DataFrame,
+    grade_db: str,
+    grade_schema: str,
+    grade_table: str,
+    stage_suffix: str = "_STAGE",
+    drop_stage: bool = True,
+) -> Tuple[bool, int, int, str]:
+    """
+    Write grades_df to stage, ensure grade table exists, merge, optionally drop stage.
+    Returns (success, nchunks, nrows, stage_table_name).
+    """
+    stage_table = f"{grade_table}{stage_suffix}"
+
+    out_cfg = dict(cfg)
+    out_cfg["database"] = grade_db
+    out_cfg["schema"] = grade_schema
+
+    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, grades_df, stage_table)
+
+    ensure_grades_table_exists_chats(out_cfg, grade_db=grade_db, grade_schema=grade_schema, grade_table=grade_table)
+
+    merge_grades_into_table_chats(
+        out_cfg,
+        grade_db=grade_db,
+        grade_schema=grade_schema,
+        grade_table=grade_table,
+        stage_table=stage_table,
+    )
+
+    if drop_stage:
+        sql = f'DROP TABLE IF EXISTS "{grade_db}"."{grade_schema}"."{stage_table}";'
+        execute_snowflake_multi_query(out_cfg, sql)
+
+    return success, nchunks, nrows, stage_table
+
+
+# Calls
+def write_stage_and_merge_grades_calls(
+    cfg: Dict[str, Any],
+    *,
+    grades_df: pd.DataFrame,
+    grade_db: str,
+    grade_schema: str,
+    grade_table: str,
+    stage_suffix: str = "_STAGE",
+    drop_stage: bool = True,
+) -> Tuple[bool, int, int, str]:
+    """
+    Write grades_df to stage, ensure grade table exists, merge, optionally drop stage.
+    Returns (success, nchunks, nrows, stage_table_name).
+    """
+    stage_table = f"{grade_table}{stage_suffix}"
+
+    out_cfg = dict(cfg)
+    out_cfg["database"] = grade_db
+    out_cfg["schema"] = grade_schema
+
+    success, nchunks, nrows = write_pandas_create_or_replace_stage(out_cfg, grades_df, stage_table)
+
+    ensure_grades_table_exists_calls(out_cfg, grade_db=grade_db, grade_schema=grade_schema, grade_table=grade_table)
+
+    merge_grades_into_table_calls(
+        out_cfg,
+        grade_db=grade_db,
+        grade_schema=grade_schema,
+        grade_table=grade_table,
+        stage_table=stage_table,
+    )
+
+    if drop_stage:
+        sql = f'DROP TABLE IF EXISTS "{grade_db}"."{grade_schema}"."{stage_table}";'
+        execute_snowflake_multi_query(out_cfg, sql)
+
+    return success, nchunks, nrows, stage_table
+
+
+def new_grader_run_id(prefix: str = "grade") -> str:
+    """
+    Utility to generate a unique run id for grading runs.
+    """
+    return f"{prefix}-{uuid.uuid4().hex[:12]}"
+
+
+# ...existing code...
+
+def merge_grades_into_table_chats(
+    cfg: Dict[str, Any],
+    *,
+    grade_db: str,
+    grade_schema: str,
+    grade_table: str,
+    stage_table: str,
+) -> None:
+    """
+    Merge stage -> grade table. Cast SRC.GRADED_AT to TIMESTAMP_NTZ to avoid stage type inference issues.
+    """
+    sql = f"""
+    MERGE INTO "{grade_db}"."{grade_schema}"."{grade_table}" TGT
+    USING "{grade_db}"."{grade_schema}"."{stage_table}" SRC
+      ON TGT."CHAT_TRANSCRIPT_NAME" = SRC."CHAT_TRANSCRIPT_NAME"
+    WHEN MATCHED THEN UPDATE SET
+      TGT."GRADER_RUN_ID" = SRC."GRADER_RUN_ID",
+      TGT."GRADED_AT" = TRY_TO_TIMESTAMP_NTZ(SRC."GRADED_AT"),
+
+      TGT."CONTACT_TYPE_VERDICT" = SRC."CONTACT_TYPE_VERDICT",
+      TGT."CONTACT_TYPE_SCORE" = SRC."CONTACT_TYPE_SCORE",
+      TGT."CONTACT_TYPE_SUGGESTED_LABEL" = SRC."CONTACT_TYPE_SUGGESTED_LABEL",
+
+      TGT."DOMAIN_VERDICT" = SRC."DOMAIN_VERDICT",
+      TGT."DOMAIN_SCORE" = SRC."DOMAIN_SCORE",
+      TGT."DOMAIN_SUGGESTED_LABEL" = SRC."DOMAIN_SUGGESTED_LABEL",
+
+      TGT."SUBDOMAIN_VERDICT" = SRC."SUBDOMAIN_VERDICT",
+      TGT."SUBDOMAIN_SCORE" = SRC."SUBDOMAIN_SCORE",
+      TGT."SUBDOMAIN_SUGGESTED_LABEL" = SRC."SUBDOMAIN_SUGGESTED_LABEL",
+
+      TGT."ROOT_CAUSE_VERDICT" = SRC."ROOT_CAUSE_VERDICT",
+      TGT."ROOT_CAUSE_SCORE" = SRC."ROOT_CAUSE_SCORE",
+      TGT."ROOT_CAUSE_SUGGESTED_LABEL" = SRC."ROOT_CAUSE_SUGGESTED_LABEL",
+
+      TGT."CONTACT_DRIVER_VERDICT" = SRC."CONTACT_DRIVER_VERDICT",
+      TGT."CONTACT_DRIVER_SCORE" = SRC."CONTACT_DRIVER_SCORE",
+      TGT."CONTACT_DRIVER_SUGGESTED_LABEL" = SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
+
+      TGT."OVERALL_SCORE" = SRC."OVERALL_SCORE"
+    WHEN NOT MATCHED THEN INSERT (
+      "CHAT_TRANSCRIPT_NAME",
+      "GRADER_RUN_ID",
+      "GRADED_AT",
+
+      "CONTACT_TYPE_VERDICT",
+      "CONTACT_TYPE_SCORE",
+      "CONTACT_TYPE_SUGGESTED_LABEL",
+
+      "DOMAIN_VERDICT",
+      "DOMAIN_SCORE",
+      "DOMAIN_SUGGESTED_LABEL",
+
+      "SUBDOMAIN_VERDICT",
+      "SUBDOMAIN_SCORE",
+      "SUBDOMAIN_SUGGESTED_LABEL",
+
+      "ROOT_CAUSE_VERDICT",
+      "ROOT_CAUSE_SCORE",
+      "ROOT_CAUSE_SUGGESTED_LABEL",
+
+      "CONTACT_DRIVER_VERDICT",
+      "CONTACT_DRIVER_SCORE",
+      "CONTACT_DRIVER_SUGGESTED_LABEL",
+
+      "OVERALL_SCORE"
+    ) VALUES (
+      SRC."CHAT_TRANSCRIPT_NAME",
+      SRC."GRADER_RUN_ID",
+      TRY_TO_TIMESTAMP_NTZ(SRC."GRADED_AT"),
+
+      SRC."CONTACT_TYPE_VERDICT",
+      SRC."CONTACT_TYPE_SCORE",
+      SRC."CONTACT_TYPE_SUGGESTED_LABEL",
+
+      SRC."DOMAIN_VERDICT",
+      SRC."DOMAIN_SCORE",
+      SRC."DOMAIN_SUGGESTED_LABEL",
+
+      SRC."SUBDOMAIN_VERDICT",
+      SRC."SUBDOMAIN_SCORE",
+      SRC."SUBDOMAIN_SUGGESTED_LABEL",
+
+      SRC."ROOT_CAUSE_VERDICT",
+      SRC."ROOT_CAUSE_SCORE",
+      SRC."ROOT_CAUSE_SUGGESTED_LABEL",
+
+      SRC."CONTACT_DRIVER_VERDICT",
+      SRC."CONTACT_DRIVER_SCORE",
+      SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
+
+      SRC."OVERALL_SCORE"
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+
+
+def merge_grades_into_table_calls(
+    cfg: Dict[str, Any],
+    *,
+    grade_db: str,
+    grade_schema: str,
+    grade_table: str,
+    stage_table: str,
+) -> None:
+    """
+    Merge stage -> grade table. Cast SRC.GRADED_AT to TIMESTAMP_NTZ to avoid stage type inference issues.
+    """
+    sql = f"""
+    MERGE INTO "{grade_db}"."{grade_schema}"."{grade_table}" TGT
+    USING "{grade_db}"."{grade_schema}"."{stage_table}" SRC
+      ON TGT."CALL_ID" = SRC."CALL_ID"
+    WHEN MATCHED THEN UPDATE SET
+      TGT."GRADER_RUN_ID" = SRC."GRADER_RUN_ID",
+      TGT."GRADED_AT" = TRY_TO_TIMESTAMP_NTZ(SRC."GRADED_AT"),
+
+      TGT."CONTACT_TYPE_VERDICT" = SRC."CONTACT_TYPE_VERDICT",
+      TGT."CONTACT_TYPE_SCORE" = SRC."CONTACT_TYPE_SCORE",
+      TGT."CONTACT_TYPE_SUGGESTED_LABEL" = SRC."CONTACT_TYPE_SUGGESTED_LABEL",
+
+      TGT."DOMAIN_VERDICT" = SRC."DOMAIN_VERDICT",
+      TGT."DOMAIN_SCORE" = SRC."DOMAIN_SCORE",
+      TGT."DOMAIN_SUGGESTED_LABEL" = SRC."DOMAIN_SUGGESTED_LABEL",
+
+      TGT."SUBDOMAIN_VERDICT" = SRC."SUBDOMAIN_VERDICT",
+      TGT."SUBDOMAIN_SCORE" = SRC."SUBDOMAIN_SCORE",
+      TGT."SUBDOMAIN_SUGGESTED_LABEL" = SRC."SUBDOMAIN_SUGGESTED_LABEL",
+
+      TGT."ROOT_CAUSE_VERDICT" = SRC."ROOT_CAUSE_VERDICT",
+      TGT."ROOT_CAUSE_SCORE" = SRC."ROOT_CAUSE_SCORE",
+      TGT."ROOT_CAUSE_SUGGESTED_LABEL" = SRC."ROOT_CAUSE_SUGGESTED_LABEL",
+
+      TGT."CONTACT_DRIVER_VERDICT" = SRC."CONTACT_DRIVER_VERDICT",
+      TGT."CONTACT_DRIVER_SCORE" = SRC."CONTACT_DRIVER_SCORE",
+      TGT."CONTACT_DRIVER_SUGGESTED_LABEL" = SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
+
+      TGT."OVERALL_SCORE" = SRC."OVERALL_SCORE"
+    WHEN NOT MATCHED THEN INSERT (
+      "CALL_ID",
+      "GRADER_RUN_ID",
+      "GRADED_AT",
+
+      "CONTACT_TYPE_VERDICT",
+      "CONTACT_TYPE_SCORE",
+      "CONTACT_TYPE_SUGGESTED_LABEL",
+
+      "DOMAIN_VERDICT",
+      "DOMAIN_SCORE",
+      "DOMAIN_SUGGESTED_LABEL",
+
+      "SUBDOMAIN_VERDICT",
+      "SUBDOMAIN_SCORE",
+      "SUBDOMAIN_SUGGESTED_LABEL",
+
+      "ROOT_CAUSE_VERDICT",
+      "ROOT_CAUSE_SCORE",
+      "ROOT_CAUSE_SUGGESTED_LABEL",
+
+      "CONTACT_DRIVER_VERDICT",
+      "CONTACT_DRIVER_SCORE",
+      "CONTACT_DRIVER_SUGGESTED_LABEL",
+
+      "OVERALL_SCORE"
+    ) VALUES (
+      SRC."CALL_ID",
+      SRC."GRADER_RUN_ID",
+      TRY_TO_TIMESTAMP_NTZ(SRC."GRADED_AT"),
+
+      SRC."CONTACT_TYPE_VERDICT",
+      SRC."CONTACT_TYPE_SCORE",
+      SRC."CONTACT_TYPE_SUGGESTED_LABEL",
+
+      SRC."DOMAIN_VERDICT",
+      SRC."DOMAIN_SCORE",
+      SRC."DOMAIN_SUGGESTED_LABEL",
+
+      SRC."SUBDOMAIN_VERDICT",
+      SRC."SUBDOMAIN_SCORE",
+      SRC."SUBDOMAIN_SUGGESTED_LABEL",
+
+      SRC."ROOT_CAUSE_VERDICT",
+      SRC."ROOT_CAUSE_SCORE",
+      SRC."ROOT_CAUSE_SUGGESTED_LABEL",
+
+      SRC."CONTACT_DRIVER_VERDICT",
+      SRC."CONTACT_DRIVER_SCORE",
+      SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
+
+      SRC."OVERALL_SCORE"
+    );
+    """
+    execute_snowflake_multi_query(cfg, sql)
+
+# ...existing code...
