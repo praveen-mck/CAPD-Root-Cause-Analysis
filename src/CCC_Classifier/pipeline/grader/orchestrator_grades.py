@@ -5,7 +5,7 @@ Grading orchestrator: grade a single prediction row against the transcript.
 Responsibilities:
 - Accept transcript_text + predicted labels (5 fields)
 - Run grading stages in sequence (or independently):
-    contact_type -> domain -> subdomain -> root_cause -> contact_driver
+    contact_type -> domain -> subdomain
 - Return a single normalized dict consistent with batchgrades.py expectations
 
 Output contract:
@@ -13,8 +13,6 @@ Output contract:
   "CONTACT_TYPE": {"verdict": "Correct|Partial|Incorrect", "score": 0|0.5|1, "suggested_label": str},
   "DOMAIN": {...},
   "SUBDOMAIN": {...},
-  "ROOT_CAUSE": {...},
-  "CONTACT_DRIVER": {...},
   "overall_score": float
 }
 """
@@ -27,14 +25,12 @@ from typing import Any, Dict, Optional
 from CCC_Classifier.pipeline.grader.stages_grades import (
     stage_grade_contact_type,
     stage_grade_domain,
-    stage_grade_subdomain,
-    stage_grade_root_cause,
-    stage_grade_contact_driver,
+    stage_grade_subdomain
 )
 
 logger = logging.getLogger(__name__)
 
-GRADE_FIELDS = ("CONTACT_TYPE", "DOMAIN", "SUBDOMAIN", "ROOT_CAUSE", "CONTACT_DRIVER")
+GRADE_FIELDS = ("CONTACT_TYPE", "DOMAIN", "SUBDOMAIN")
 _ALLOWED_VERDICTS = {"Correct", "Partial", "Incorrect"}
 
 
@@ -129,31 +125,11 @@ async def analyze_predict_row(
             max_completion_tokens=max_completion_tokens,
             use_json_mode=use_json_mode,
         )
-        rc = await stage_grade_root_cause(
-            client=client,
-            deployment=deployment,
-            transcript=transcript,
-            predicted_root_cause=str(predicted.get("ROOT_CAUSE") or ""),
-            predicted_subdomain=str(predicted.get("SUBDOMAIN") or ""),
-            max_completion_tokens=max_completion_tokens,
-            use_json_mode=use_json_mode,
-        )
-        print("Root Cause:", rc)
-        drv = await stage_grade_contact_driver(
-            client=client,
-            deployment=deployment,
-            transcript=transcript,
-            predicted_contact_driver=str(predicted.get("CONTACT_DRIVER") or ""),
-            max_completion_tokens=max_completion_tokens,
-            use_json_mode=use_json_mode,
-        )
 
         out = {
             "CONTACT_TYPE": _normalize_field_grade(ct),
             "DOMAIN": _normalize_field_grade(dom),
             "SUBDOMAIN": _normalize_field_grade(sub),
-            "ROOT_CAUSE": _normalize_field_grade(rc),
-            "CONTACT_DRIVER": _normalize_field_grade(drv),
         }
         return {**out, "overall_score": _overall_score(out)}
 

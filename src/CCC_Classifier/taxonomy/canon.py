@@ -19,9 +19,7 @@ from typing import Dict, List, Optional
 from .dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_BY_DOMAIN_CANON,
-    ROOT_CAUSES_BY_SUBDOMAIN_CANON,
-    CONTACT_DRIVERS_CANON,
+    SUBDOMAINS_BY_DOMAIN_CANON
 )
 
 # -----------------------------
@@ -82,11 +80,7 @@ def _build_nested_norm_map(d: Dict[str, List[str]]) -> Dict[str, Dict[str, str]]
 # -----------------------------
 CONTACT_TYPES_MAP: Dict[str, str] = _build_norm_map(CONTACT_TYPES_CANON)
 DOMAINS_MAP: Dict[str, str] = _build_norm_map(DOMAINS_CANON)
-CONTACT_DRIVERS_MAP: Dict[str, str] = _build_norm_map(CONTACT_DRIVERS_CANON)
-
 SUBDOMAINS_MAP_BY_DOMAIN: Dict[str, Dict[str, str]] = _build_nested_norm_map(SUBDOMAINS_BY_DOMAIN_CANON)
-
-ROOT_CAUSES_MAP_BY_SUBDOMAIN: Dict[str, Dict[str, str]] = _build_nested_norm_map(ROOT_CAUSES_BY_SUBDOMAIN_CANON)
 
 
 def canonicalize(value: str, allowed_map: Dict[str, str]) -> Optional[str]:
@@ -103,7 +97,7 @@ def canonicalize(value: str, allowed_map: Dict[str, str]) -> Optional[str]:
 def canonicalize_in_context(value: str, allowed_values: List[str]) -> Optional[str]:
     """
     Canonicalize using an explicit list of allowed values.
-    Helpful for domain->subdomain and subdomain->root cause.
+    Helpful for domain->subdomain and subdomain.
     """
     if not value:
         return None
@@ -192,11 +186,3 @@ def canonical_contact_type_or_other(value: str) -> str:
     """
     canon = canonicalize(value, CONTACT_TYPES_MAP)
     return canon if canon else other_free_text(value, max_words=3)
-
-
-def canonical_driver_or_other(value: str) -> str:
-    """
-    Canonicalize driver against CONTACT_DRIVERS_CANON; otherwise return Other: ...
-    """
-    canon = canonicalize(value, CONTACT_DRIVERS_MAP)
-    return canon if canon else other_free_text(value, max_words=5)

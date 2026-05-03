@@ -22,15 +22,12 @@ from CCC_Classifier.llm.parsing import clamp_conf, extract_content_and_usage, ge
 from CCC_Classifier.pipeline.prompts import (
     system_prompt_SHORT_SUMMARY,
     system_prompt_DETAILED_SUMMARY,
-    system_prompt_contact_driver,
     system_prompt_contact_type,
     system_prompt_domain,
-    system_prompt_root_cause,
     system_prompt_subdomain,
 )
 from CCC_Classifier.taxonomy.canon import (
     canonical_domain_or_other,
-    canonical_driver_or_other,
     canonical_or_other,
     canonicalize,
     other_free_text,
@@ -39,7 +36,6 @@ from CCC_Classifier.taxonomy.canon import (
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     SUBDOMAINS_BY_DOMAIN_CANON,
-    ROOT_CAUSES_BY_SUBDOMAIN_CANON,
 )
 
 
@@ -193,94 +189,6 @@ async def stage_subdomain(
         subdomain = canonical_or_other(raw, allowed_values=allowed, max_words=5)
 
     return {"subdomain": subdomain, "confidence": conf, "_usage": usage, "_finish": finish}
-
-
-async def stage_root_cause(
-    *,
-    client: Any,
-    deployment: str,
-    transcript: str,
-    subdomain: str,
-    max_completion_tokens: int = 256,
-    use_json_mode: bool = True,
-) -> Dict[str, Any]:
-    """
-    Returns:
-      {
-        "root_cause": <canonical root cause for the given subdomain OR Other: ...>,
-        "confidence": <0..1>,
-        "_usage": {...},
-        "_finish": "...",
-      }
-    """
-    sys_text = system_prompt_root_cause(subdomain)
-    user_text = _user_transcript_block(transcript, prefix=f"Subdomain: {subdomain}")
-
-    resp = await send_chat_request(
-        client=client,
-        deployment=deployment,
-        system_text=sys_text,
-        user_text=user_text,
-        max_out_tokens=max_completion_tokens,
-        use_json_mode=use_json_mode,
-    )
-
-    content, usage, finish = extract_content_and_usage(resp)
-    data = safe_parse_json(content)
-
-    raw = _as_str(get_json_field(data, "root_cause", ""))
-    conf = clamp_conf(get_json_field(data, "confidence", 0.0))
-
-    allowed: List[str] = ROOT_CAUSES_BY_SUBDOMAIN_CANON.get(subdomain, [])
-    # If no defined root causes for that subdomain, root cause must be Other.
-    if allowed:
-    #     root_cause = other_free_text(raw, max_words=8)
-    # else:
-        root_cause = canonical_or_other(raw, allowed_values=allowed, max_words=8)
-
-    return {"root_cause": root_cause, "confidence": conf, "_usage": usage, "_finish": finish}
-
-
-async def stage_contact_driver(
-    *,
-    client: Any,
-    deployment: str,
-    transcript: str,
-    max_completion_tokens: int = 256,
-    use_json_mode: bool = True,
-) -> Dict[str, Any]:
-    """
-    Returns:
-      {
-        "contact_driver": <canonical driver or Other: ...>,
-        "confidence": <0..1>,
-        "_usage": {...},
-        "_finish": "...",
-      }
-    """
-    sys_text = system_prompt_contact_driver()
-    user_text = _user_transcript_block(transcript)
-
-    resp = await send_chat_request(
-        client=client,
-        deployment=deployment,
-        system_text=sys_text,
-        user_text=user_text,
-        max_out_tokens=max_completion_tokens,
-        use_json_mode=use_json_mode,
-    )
-
-    content, usage, finish = extract_content_and_usage(resp)
-    data = safe_parse_json(content)
-
-    raw = _as_str(get_json_field(data, "contact_driver", ""))
-    conf = clamp_conf(get_json_field(data, "confidence", 0.0))
-
-    driver = canonical_driver_or_other(raw)
-
-    return {"contact_driver": driver, "confidence": conf, "_usage": usage, "_finish": finish}
-
-
 
 async def stage_SHORT_SUMMARY(
     *,

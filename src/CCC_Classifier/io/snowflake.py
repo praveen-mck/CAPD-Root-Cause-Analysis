@@ -263,8 +263,6 @@ def ensure_chats_results_table_exists(cfg: Dict[str, Any], *, result_db: str, re
       "CONTACT_TYPE" STRING,
       "DOMAIN" STRING,
       "SUBDOMAIN" STRING,
-      "ROOT_CAUSE" STRING,
-      "CONTACT_DRIVER" STRING,
       "SHORT_SUMMARY" STRING,
       "DETAILED_SUMMARY" STRING,
       "CONFIDENCE" FLOAT,
@@ -287,8 +285,6 @@ def ensure_call_results_table_exists(cfg: Dict[str, Any], *, result_db: str, res
       "CONTACT_TYPE" STRING,
       "DOMAIN" STRING,
       "SUBDOMAIN" STRING,
-      "ROOT_CAUSE" STRING,
-      "CONTACT_DRIVER" STRING,
       "SHORT_SUMMARY" STRING,
       "DETAILED_SUMMARY" STRING,
       "CONFIDENCE" FLOAT,
@@ -393,7 +389,7 @@ def merge_chats_results_into_table(
     Merge from stage_table into target_table using id_col.
 
     Assumes your stage dataframe uses uppercase column names as written by batch.py:
-      CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER,
+      CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN
       SHORT_SUMMARY, DETAILED_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT
 
     Your scripts/main.py passes id_col="CHAT_TRANSCRIPT_NAME" (keep-as-is behavior).
@@ -409,8 +405,6 @@ def merge_chats_results_into_table(
       TGT."CONTACT_TYPE"    = SRC."CONTACT_TYPE",
       TGT."DOMAIN"          = SRC."DOMAIN",
       TGT."SUBDOMAIN"       = SRC."SUBDOMAIN",
-      TGT."ROOT_CAUSE"      = SRC."ROOT_CAUSE",
-      TGT."CONTACT_DRIVER"  = SRC."CONTACT_DRIVER",
       TGT."SHORT_SUMMARY"    = SRC."SHORT_SUMMARY",
       TGT."DETAILED_SUMMARY" = SRC."DETAILED_SUMMARY",
       TGT."CONFIDENCE"      = SRC."CONFIDENCE",
@@ -418,12 +412,12 @@ def merge_chats_results_into_table(
       TGT."IS_NO_INPUT"     = SRC."IS_NO_INPUT"
     WHEN NOT MATCHED THEN INSERT (
       "{id_col}",
-      "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN", "ROOT_CAUSE",
-      "CONTACT_DRIVER", "SHORT_SUMMARY", "DETAILED_SUMMARY", "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
+      "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN",
+      "SHORT_SUMMARY", "DETAILED_SUMMARY", "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
     ) VALUES (
       SRC."{id_col}",
-      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN", SRC."ROOT_CAUSE",
-      SRC."CONTACT_DRIVER", SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY", SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
+      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN",
+      SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY", SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
     );
     """
     print("[Snowflake] Merging stage -> target...\n", sql.strip())
@@ -447,8 +441,6 @@ def merge_call_results_into_table(
       TGT."CONTACT_TYPE"     = SRC."CONTACT_TYPE",
       TGT."DOMAIN"           = SRC."DOMAIN",
       TGT."SUBDOMAIN"        = SRC."SUBDOMAIN",
-      TGT."ROOT_CAUSE"       = SRC."ROOT_CAUSE",
-      TGT."CONTACT_DRIVER"   = SRC."CONTACT_DRIVER",
       TGT."SHORT_SUMMARY"    = SRC."SHORT_SUMMARY",
       TGT."DETAILED_SUMMARY" = SRC."DETAILED_SUMMARY",
       TGT."CONFIDENCE"       = SRC."CONFIDENCE",
@@ -456,13 +448,13 @@ def merge_call_results_into_table(
       TGT."IS_NO_INPUT"      = SRC."IS_NO_INPUT"
     WHEN NOT MATCHED THEN INSERT (
       "CALL_ID",
-      "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN", "ROOT_CAUSE",
-      "CONTACT_DRIVER", "SHORT_SUMMARY", "DETAILED_SUMMARY",
+      "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN",
+      "SHORT_SUMMARY", "DETAILED_SUMMARY",
       "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
     ) VALUES (
       SRC."CALL_ID",
-      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN", SRC."ROOT_CAUSE",
-      SRC."CONTACT_DRIVER", SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY",
+      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN",
+      SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY",
       SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
     );
     """
@@ -487,7 +479,7 @@ def load_predictions_for_grading_join_source_chats(
     Returns columns:
       - CHAT_TRANSCRIPT_NAME
       - BODY (from source table)
-      - CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER (from prediction table)
+      - CONTACT_TYPE, DOMAIN, SUBDOMAIN (from prediction table)
     """
     lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
 
@@ -497,9 +489,7 @@ def load_predictions_for_grading_join_source_chats(
       s."{text_col}" AS "BODY",
       p."CONTACT_TYPE",
       p."DOMAIN",
-      p."SUBDOMAIN",
-      p."ROOT_CAUSE",
-      p."CONTACT_DRIVER"
+      p."SUBDOMAIN"
     FROM "{pred_db}"."{pred_schema}"."{pred_table}" p
     INNER JOIN "{source_db}"."{source_schema}"."{source_table}" s
       ON p."{id_col}" = s."{id_col}"
@@ -526,7 +516,7 @@ def load_predictions_for_grading_join_source_calls(
     Returns columns:
       - CALL_ID
       - DIARIZED_TRANSCRIPT_TEXT (from source table)
-      - CONTACT_TYPE, DOMAIN, SUBDOMAIN, ROOT_CAUSE, CONTACT_DRIVER (from prediction table)
+      - CONTACT_TYPE, DOMAIN, SUBDOMAIN (from prediction table)
     """
     lim = f"\nLIMIT {int(limit)}" if int(limit) > 0 else ""
 
@@ -536,9 +526,7 @@ def load_predictions_for_grading_join_source_calls(
       s."{text_col}" AS "DIARIZED_TRANSCRIPT_TEXT",
       p."CONTACT_TYPE",
       p."DOMAIN",
-      p."SUBDOMAIN",
-      p."ROOT_CAUSE",
-      p."CONTACT_DRIVER"
+      p."SUBDOMAIN"
     FROM "{pred_db}"."{pred_schema}"."{pred_table}" p
     INNER JOIN "{source_db}"."{source_schema}"."{source_table}" s
       ON p."{id_col}" = s."{id_col}"
@@ -582,14 +570,6 @@ def ensure_grades_table_exists_chats(
       "SUBDOMAIN_SCORE" FLOAT,
       "SUBDOMAIN_SUGGESTED_LABEL" STRING,
 
-      "ROOT_CAUSE_VERDICT" STRING,
-      "ROOT_CAUSE_SCORE" FLOAT,
-      "ROOT_CAUSE_SUGGESTED_LABEL" STRING,
-
-      "CONTACT_DRIVER_VERDICT" STRING,
-      "CONTACT_DRIVER_SCORE" FLOAT,
-      "CONTACT_DRIVER_SUGGESTED_LABEL" STRING,
-
       -- overall
       "OVERALL_SCORE" FLOAT
     );
@@ -632,14 +612,6 @@ def ensure_grades_table_exists_calls(
       "SUBDOMAIN_VERDICT" STRING,
       "SUBDOMAIN_SCORE" FLOAT,
       "SUBDOMAIN_SUGGESTED_LABEL" STRING,
-
-      "ROOT_CAUSE_VERDICT" STRING,
-      "ROOT_CAUSE_SCORE" FLOAT,
-      "ROOT_CAUSE_SUGGESTED_LABEL" STRING,
-
-      "CONTACT_DRIVER_VERDICT" STRING,
-      "CONTACT_DRIVER_SCORE" FLOAT,
-      "CONTACT_DRIVER_SUGGESTED_LABEL" STRING,
 
       -- overall
       "OVERALL_SCORE" FLOAT
@@ -767,14 +739,6 @@ def merge_grades_into_table_chats(
       TGT."SUBDOMAIN_SCORE" = SRC."SUBDOMAIN_SCORE",
       TGT."SUBDOMAIN_SUGGESTED_LABEL" = SRC."SUBDOMAIN_SUGGESTED_LABEL",
 
-      TGT."ROOT_CAUSE_VERDICT" = SRC."ROOT_CAUSE_VERDICT",
-      TGT."ROOT_CAUSE_SCORE" = SRC."ROOT_CAUSE_SCORE",
-      TGT."ROOT_CAUSE_SUGGESTED_LABEL" = SRC."ROOT_CAUSE_SUGGESTED_LABEL",
-
-      TGT."CONTACT_DRIVER_VERDICT" = SRC."CONTACT_DRIVER_VERDICT",
-      TGT."CONTACT_DRIVER_SCORE" = SRC."CONTACT_DRIVER_SCORE",
-      TGT."CONTACT_DRIVER_SUGGESTED_LABEL" = SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
-
       TGT."OVERALL_SCORE" = SRC."OVERALL_SCORE"
     WHEN NOT MATCHED THEN INSERT (
       "CHAT_TRANSCRIPT_NAME",
@@ -793,14 +757,6 @@ def merge_grades_into_table_chats(
       "SUBDOMAIN_SCORE",
       "SUBDOMAIN_SUGGESTED_LABEL",
 
-      "ROOT_CAUSE_VERDICT",
-      "ROOT_CAUSE_SCORE",
-      "ROOT_CAUSE_SUGGESTED_LABEL",
-
-      "CONTACT_DRIVER_VERDICT",
-      "CONTACT_DRIVER_SCORE",
-      "CONTACT_DRIVER_SUGGESTED_LABEL",
-
       "OVERALL_SCORE"
     ) VALUES (
       SRC."CHAT_TRANSCRIPT_NAME",
@@ -818,14 +774,6 @@ def merge_grades_into_table_chats(
       SRC."SUBDOMAIN_VERDICT",
       SRC."SUBDOMAIN_SCORE",
       SRC."SUBDOMAIN_SUGGESTED_LABEL",
-
-      SRC."ROOT_CAUSE_VERDICT",
-      SRC."ROOT_CAUSE_SCORE",
-      SRC."ROOT_CAUSE_SUGGESTED_LABEL",
-
-      SRC."CONTACT_DRIVER_VERDICT",
-      SRC."CONTACT_DRIVER_SCORE",
-      SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
 
       SRC."OVERALL_SCORE"
     );
@@ -865,14 +813,6 @@ def merge_grades_into_table_calls(
       TGT."SUBDOMAIN_SCORE" = SRC."SUBDOMAIN_SCORE",
       TGT."SUBDOMAIN_SUGGESTED_LABEL" = SRC."SUBDOMAIN_SUGGESTED_LABEL",
 
-      TGT."ROOT_CAUSE_VERDICT" = SRC."ROOT_CAUSE_VERDICT",
-      TGT."ROOT_CAUSE_SCORE" = SRC."ROOT_CAUSE_SCORE",
-      TGT."ROOT_CAUSE_SUGGESTED_LABEL" = SRC."ROOT_CAUSE_SUGGESTED_LABEL",
-
-      TGT."CONTACT_DRIVER_VERDICT" = SRC."CONTACT_DRIVER_VERDICT",
-      TGT."CONTACT_DRIVER_SCORE" = SRC."CONTACT_DRIVER_SCORE",
-      TGT."CONTACT_DRIVER_SUGGESTED_LABEL" = SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
-
       TGT."OVERALL_SCORE" = SRC."OVERALL_SCORE"
     WHEN NOT MATCHED THEN INSERT (
       "CALL_ID",
@@ -891,14 +831,6 @@ def merge_grades_into_table_calls(
       "SUBDOMAIN_SCORE",
       "SUBDOMAIN_SUGGESTED_LABEL",
 
-      "ROOT_CAUSE_VERDICT",
-      "ROOT_CAUSE_SCORE",
-      "ROOT_CAUSE_SUGGESTED_LABEL",
-
-      "CONTACT_DRIVER_VERDICT",
-      "CONTACT_DRIVER_SCORE",
-      "CONTACT_DRIVER_SUGGESTED_LABEL",
-
       "OVERALL_SCORE"
     ) VALUES (
       SRC."CALL_ID",
@@ -916,14 +848,6 @@ def merge_grades_into_table_calls(
       SRC."SUBDOMAIN_VERDICT",
       SRC."SUBDOMAIN_SCORE",
       SRC."SUBDOMAIN_SUGGESTED_LABEL",
-
-      SRC."ROOT_CAUSE_VERDICT",
-      SRC."ROOT_CAUSE_SCORE",
-      SRC."ROOT_CAUSE_SUGGESTED_LABEL",
-
-      SRC."CONTACT_DRIVER_VERDICT",
-      SRC."CONTACT_DRIVER_SCORE",
-      SRC."CONTACT_DRIVER_SUGGESTED_LABEL",
 
       SRC."OVERALL_SCORE"
     );

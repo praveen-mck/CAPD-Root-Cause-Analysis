@@ -28,9 +28,7 @@ from typing import List, Optional
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_BY_DOMAIN_CANON,
-    ROOT_CAUSES_BY_SUBDOMAIN_CANON,
-    CONTACT_DRIVERS_CANON,
+    SUBDOMAINS_BY_DOMAIN_CANON
 )
 
 
@@ -147,30 +145,6 @@ def system_prompt_grade_subdomain() -> str:
     )
 
 
-def system_prompt_grade_root_cause() -> str:
-    return (
-        "You are an expert evaluator grading a classifier's predicted ROOT_CAUSE.\n"
-        "Hierarchy behavior:\n"
-        "- If SUBDOMAIN context is provided, first judge the predicted ROOT_CAUSE within that SUBDOMAIN.\n"
-        "- If verdict is Partial/Incorrect, you may suggest a better label from the full Allowed Labels list.\n"
-        "- Use free-text only if no allowed label fits.\n"
-        "- Do not suggest a root cause that contradicts the predicted SUBDOMAIN context unless the subdomain itself is incorrect."
-        + _grading_rules_block()
-        + _json_rule_block()
-    )
-
-
-def system_prompt_grade_contact_driver() -> str:
-    return (
-        "You are an expert evaluator grading a classifier's predicted CONTACT_DRIVER.\n"
-        "Definition of CONTACT_DRIVER:\n"
-        "- A contact_driver is the earliest explicit customer-observed stimulus or need that triggered contacting support.\n"
-        "- It is NOT the detailed root cause or the requested action.\n"
-        + _grading_rules_block()
-        + _json_rule_block()
-    )
-
-
 # ----------------------
 # User prompts (per stage)
 # ----------------------
@@ -227,37 +201,3 @@ def user_prompt_grade_subdomain(
         ]
     )
     return "\n\n".join(parts)
-
-
-def user_prompt_grade_root_cause(
-    *,
-    transcript: str,
-    predicted_root_cause: str,
-    predicted_subdomain: Optional[str] = None,
-) -> str:
-    all_root_causes = _flatten_values(ROOT_CAUSES_BY_SUBDOMAIN_CANON)
-    parts: List[str] = []
-    if predicted_subdomain:
-        parts.append(f"Context SUBDOMAIN (classifier output): {predicted_subdomain}")
-    parts.extend(
-        [
-            f"Predicted ROOT_CAUSE: {predicted_root_cause}",
-            _allowed_block("Allowed ROOT_CAUSE labels (full taxonomy)", all_root_causes),
-            _transcript_block(transcript),
-        ]
-    )
-    return "\n\n".join(parts)
-
-
-def user_prompt_grade_contact_driver(
-    *,
-    transcript: str,
-    predicted_contact_driver: str,
-) -> str:
-    return "\n\n".join(
-        [
-            f"Predicted CONTACT_DRIVER: {predicted_contact_driver}",
-            _allowed_block("Allowed CONTACT_DRIVER labels", CONTACT_DRIVERS_CANON),
-            _transcript_block(transcript),
-        ]
-    )

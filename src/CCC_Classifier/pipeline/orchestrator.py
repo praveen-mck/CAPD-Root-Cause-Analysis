@@ -6,7 +6,7 @@ Pipeline orchestrator: analyze a single transcript.
 Responsibilities:
 - If no customer input (rule-based), short-circuit with "No Customer Input" outputs
 - Otherwise run stages in sequence:
-    contact_type -> domain -> subdomain -> root_cause -> contact_driver -> SHORT_SUMMARY
+    contact_type -> domain -> subdomain -> SHORT_SUMMARY
 - Compute overall confidence (min of stage confidences)
 - Return a single result dict
 
@@ -24,10 +24,8 @@ from typing import Any, Dict, Optional
 from CCC_Classifier.pipeline.stages import (
     stage_SHORT_SUMMARY,
     stage_DETAILED_SUMMARY,
-    stage_contact_driver,
     stage_contact_type,
     stage_domain,
-    stage_root_cause,
     stage_subdomain,
 )
 from CCC_Classifier.utils.no_input import is_no_customer_input
@@ -57,8 +55,6 @@ def _no_input_result() -> Dict[str, Any]:
         "contact_type": "Unclear Contact",  # keep existing behavior
         "domain": "No Customer Input",
         "subdomain": "No Customer Input",
-        "root_cause": "No Customer Input",
-        "contact_driver": "No Customer Input",
         "SHORT_SUMMARY": "Customer did not provide sufficient input to agent.",
         "DETAILED_SUMMARY": "Customer did not provide sufficient input to agent.",
         "confidence": 1.0,
@@ -77,8 +73,8 @@ async def analyze_transcript(
     """
     Analyze a single transcript and return:
       {
-        contact_type, domain, subdomain, root_cause,
-        contact_driver, SHORT_SUMMARY, DETAILED_SUMMARY, confidence, IS_NO_INPUT
+        contact_type, domain, subdomain, SHORT_SUMMARY,
+        DETAILED_SUMMARY, confidence, IS_NO_INPUT
       }
 
     Notes:
@@ -138,29 +134,6 @@ async def analyze_transcript(
         subdomain = sub.get("subdomain", "")
         sub_conf = sub.get("confidence", 0.0)
 
-        stage = 'root_cause'
-        rc = await stage_root_cause(
-            client=client,
-            deployment=deployment,
-            transcript=transcript,
-            subdomain=subdomain,
-            max_completion_tokens=max_completion_tokens,
-            use_json_mode=use_json_mode,
-        )
-        root_cause = rc.get("root_cause", "")
-        rc_conf = rc.get("confidence", 0.0)
-
-        stage = 'contact_driver'
-        drv = await stage_contact_driver(
-            client=client,
-            deployment=deployment,
-            transcript=transcript,
-            max_completion_tokens=max_completion_tokens,
-            use_json_mode=use_json_mode,
-        )
-        contact_driver = drv.get("contact_driver", "")
-        drv_conf = drv.get("confidence", 0.0)
-
         stage = 'short_summary'
         ssy = await stage_SHORT_SUMMARY(
             client=client,
@@ -181,14 +154,12 @@ async def analyze_transcript(
         )
         DETAILED_SUMMARY = dsy.get("DETAILED_SUMMARY", "Context Unspecified")
 
-        overall_conf = _min_conf(ct_conf, dom_conf, sub_conf, rc_conf, drv_conf)
+        overall_conf = _min_conf(ct_conf, dom_conf, sub_conf)
 
         return {
             "contact_type": contact_type,
             "domain": domain,
             "subdomain": subdomain,
-            "root_cause": root_cause,
-            "contact_driver": contact_driver,
             "SHORT_SUMMARY": SHORT_SUMMARY,
             "DETAILED_SUMMARY": DETAILED_SUMMARY,
             "confidence": overall_conf,
@@ -211,8 +182,6 @@ async def analyze_transcript(
             "contact_type": "Unclear Contact",
             "domain": "Other: Unspecified",
             "subdomain": "Other: Unspecified",
-            "root_cause": "Other: Unspecified",
-            "contact_driver": "Other: Unspecified",
             "SHORT_SUMMARY": "Context Unspecified",
             "DETAILED_SUMMARY": "Context Unspecified",
             "confidence": 0.0,
