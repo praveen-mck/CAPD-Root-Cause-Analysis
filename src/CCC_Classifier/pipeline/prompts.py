@@ -18,7 +18,7 @@ from typing import List
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_BY_DOMAIN_CANON
+    SUBDOMAINS_CANON
 )
 
 
@@ -85,15 +85,13 @@ def system_prompt_domain() -> str:
 
 
 
-def system_prompt_subdomain(domain: str) -> str:
-    subdomains: List[str] = SUBDOMAINS_BY_DOMAIN_CANON.get(domain, [])
-    allowed_line = ", ".join(subdomains) if subdomains else ""
-    pref = f"Allowed subdomains (choose ONE): [{allowed_line}].\n" if allowed_line else ""
+def system_prompt_subdomain() -> str:
+    allowed_line = ", ".join(SUBDOMAINS_CANON)
 
     return (
         "You are an expert classifier for customer support transcripts.\n"
-        f"Task: Given domain='{domain}', choose exactly ONE subdomain.\n"
-        + pref +
+        "Task: Choose exactly ONE subdomain.\n"
+        f"Allowed subdomains (choose ONE): [{allowed_line}].\n"
         "Rules:\n"
         "- You MUST return a 'subdomain' that is EXACTLY one of the allowed subdomains listed above.\n"
         "- Do NOT paraphrase. Do NOT invent new labels.\n"

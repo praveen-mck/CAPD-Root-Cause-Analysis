@@ -19,7 +19,7 @@ from typing import Dict, List, Optional
 from .dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_BY_DOMAIN_CANON
+    SUBDOMAINS_CANON
 )
 
 # -----------------------------
@@ -71,6 +71,9 @@ def _build_nested_norm_map(d: Dict[str, List[str]]) -> Dict[str, Dict[str, str]]
     Build a dictionary mapping:
       key -> (normalized_label -> canonical_label)
     for nested structures (e.g., domain -> subdomains list).
+
+    NOTE: Kept for potential future use, but not used for subdomains anymore
+    since SUBDOMAINS are now a single global list.
     """
     return {k: _build_norm_map(vs) for k, vs in d.items()}
 
@@ -80,7 +83,7 @@ def _build_nested_norm_map(d: Dict[str, List[str]]) -> Dict[str, Dict[str, str]]
 # -----------------------------
 CONTACT_TYPES_MAP: Dict[str, str] = _build_norm_map(CONTACT_TYPES_CANON)
 DOMAINS_MAP: Dict[str, str] = _build_norm_map(DOMAINS_CANON)
-SUBDOMAINS_MAP_BY_DOMAIN: Dict[str, Dict[str, str]] = _build_nested_norm_map(SUBDOMAINS_BY_DOMAIN_CANON)
+SUBDOMAINS_MAP: Dict[str, str] = _build_norm_map(SUBDOMAINS_CANON)
 
 
 def canonicalize(value: str, allowed_map: Dict[str, str]) -> Optional[str]:

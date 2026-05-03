@@ -28,7 +28,7 @@ from typing import List, Optional
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_BY_DOMAIN_CANON
+    SUBDOMAINS_CANON
 )
 
 
@@ -98,15 +98,6 @@ def _transcript_block(transcript: str) -> str:
     return f'Transcript:\n"""\n{t}\n"""'
 
 
-def _flatten_values(d: dict) -> List[str]:
-    out: List[str] = []
-    for _, v in d.items():
-        if not v:
-            continue
-        out.extend(list(v))
-    return out
-
-
 # -------------------------
 # System prompts (per stage)
 # -------------------------
@@ -135,15 +126,13 @@ def system_prompt_grade_domain() -> str:
 def system_prompt_grade_subdomain() -> str:
     return (
         "You are an expert evaluator grading a classifier's predicted SUBDOMAIN.\n"
-        "Hierarchy behavior:\n"
-        "- If DOMAIN context is provided, first judge the predicted SUBDOMAIN within that DOMAIN.\n"
-        "- If verdict is Partial/Incorrect, you may suggest a better label from the full Allowed Labels list.\n"
+        "Notes:\n"
+        "- DOMAIN may be provided as additional context, but it does not restrict allowed subdomains.\n"
+        "- If verdict is Partial/Incorrect, you may suggest a better label from Allowed Labels.\n"
         "- Use free-text only if no allowed label fits.\n"
-        "- Do not suggest a subdomain that contradicts the predicted DOMAIN context unless the domain itself is incorrect."
         + _grading_rules_block()
         + _json_rule_block()
     )
-
 
 # ----------------------
 # User prompts (per stage)
@@ -189,14 +178,13 @@ def user_prompt_grade_subdomain(
     predicted_subdomain: str,
     predicted_domain: Optional[str] = None,
 ) -> str:
-    all_subdomains = _flatten_values(SUBDOMAINS_BY_DOMAIN_CANON)
     parts: List[str] = []
     if predicted_domain:
         parts.append(f"Context DOMAIN (classifier output): {predicted_domain}")
     parts.extend(
         [
             f"Predicted SUBDOMAIN: {predicted_subdomain}",
-            _allowed_block("Allowed SUBDOMAIN labels (full taxonomy)", all_subdomains),
+            _allowed_block("Allowed SUBDOMAIN labels", SUBDOMAINS_CANON),
             _transcript_block(transcript),
         ]
     )

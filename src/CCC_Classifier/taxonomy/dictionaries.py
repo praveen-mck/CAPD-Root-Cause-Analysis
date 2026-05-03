@@ -50,94 +50,31 @@ DOMAINS_CANON: List[str] = [
 ]
 
 # --------------------------------
-# Subdomains per Domain (canonical)
-# NOTE: "Unclassified Subdomain" removed from every domain by request.
-# NOTE: Entire "Unclassified Domain" key removed by request.
+# Subdomains (canonical) - flat list
 # --------------------------------
-
-
-
-
-SUBDOMAINS_BY_DOMAIN_CANON: Dict[str, List[str]] = {
-    "Product": [
-        "Product Availability",
-        "Product Expiry Information",
-        "Product Details & Specifications",
-        "Product Quality Issue",
-        "Product Recall",
-    ],
-    "Billing": [
-        "Invoice Request",
-        "Invoice Discrepancy",
-        "Account Hold / AR Hold",
-        "Pricing & Quotes",
-        "Credits & Adjustments",
-        "Reports & Statements",
-        "Payment Assistance",
-        "Invoice code meanings",
-    ],
-    "Order & Fulfillment": [
-        "Order Placement",
-        "Order Status",
-        "Delivery Status / ETA",
-        "Shipment Shortage",
-        "Incorrect Shipment Item",
-        "Delivery Documentation",
-        "Order cancellation",
-        "Order modification",
-        "Delivery closure notice",
-        "Packaging return policy",
-        "Holiday closure notice",
-        "Delivery schedule update",
-        "Delivery hold request",
-        "Delivery equipment issue",
-        "Price stickers",
-    ],
-    "Returns": [
-        "Return Eligibility",
-        "Return Authorization (RMA)",
-        "Return Documentation",
-        "Return Status",
-        "Return Defect",
-        "Return packaging",
-        "Return packaging instructions",
-    ],
-    "Technical Support": [
-        "Authentication Issue",
-        "Portal Error",
-        "System Outage",
-        "Account Administration",
-        "Invoice reupload",
-    ],
-    "Programs & Rewards": [
-        "Publicly Funded Campaign Info",
-        "Rewards Cards Request",
-        "Rebate Information",
-        "Promotion code issue",
-        "Promotional items availability"
-    ],
-    "Case Management": [
-        "Callback Request",
-        "Case Status Update",
-        "Case Closure Request",
-        "Reconnect with Agent",
-        "Contact Information Request",
-        "Account merge request",
-        "Account access change",
-        "Temporary closure notice",
-        "Submit proof of delivery",
-    ],
-    "Policy & Compliance": [
-        "Regulatory Documentation",
-        "Service Closures & Notices",
-        # this is a subdomain - can't be a root cause
-        #"Controlled substance policy",
-        "Access removal request",
-    ],
-    "Customer Feedback": [
-        "Appreciation",
-    ],
-    "No Customer Input": [
-        "No Customer Input",
-    ],
-}
+SUBDOMAINS_CANON: List[str] = [
+    "Delivery delay / late delivery",
+    "Missing order / missing tote",
+    "Missing narcotics",
+    "Order status / ETA follow-up",
+    "Warehouse or route disruption",
+    "Vaccine availability (COVID / Flu)",
+    "Vaccine allocation issues",
+    "Exception order requests (MOH)",
+    "Unable to order in PharmaClick",
+    "Portal access / login / password reset",
+    "System / PharmaClick display issues",
+    "Returns – damaged product",
+    "Returns – short shipment",
+    "Returns – incorrect item",
+    "Billing / invoice discrepancy",
+    "Credit follow-up",
+    "Backorder inquiry",
+    "Out-of-stock medication",
+    "Manual order request",
+    "Controlled substance handling",
+    "Missing documentation / paperwork",
+    "Consumables / supplies ordering",
+    "General order placement assistance",
+    "Escalation / supervisor follow-up",
+]

@@ -127,7 +127,6 @@ async def analyze_transcript(
             client=client,
             deployment=deployment,
             transcript=transcript,
-            domain=domain,
             max_completion_tokens=max_completion_tokens,
             use_json_mode=use_json_mode,
         )

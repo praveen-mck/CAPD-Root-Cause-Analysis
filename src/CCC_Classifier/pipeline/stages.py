@@ -30,12 +30,11 @@ from CCC_Classifier.taxonomy.canon import (
     canonical_domain_or_other,
     canonical_or_other,
     canonicalize,
-    other_free_text,
     CONTACT_TYPES_MAP,
 )
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
-    SUBDOMAINS_BY_DOMAIN_CANON,
+    SUBDOMAINS_CANON,
 )
 
 
@@ -150,21 +149,20 @@ async def stage_subdomain(
     client: Any,
     deployment: str,
     transcript: str,
-    domain: str,
     max_completion_tokens: int = 256,
     use_json_mode: bool = True,
 ) -> Dict[str, Any]:
     """
     Returns:
       {
-        "subdomain": <canonical subdomain for the given domain OR Other: ...>,
+        "subdomain": <canonical subdomain OR Other: ...>,
         "confidence": <0..1>,
         "_usage": {...},
         "_finish": "...",
       }
     """
-    sys_text = system_prompt_subdomain(domain)
-    user_text = _user_transcript_block(transcript, prefix=f"Domain: {domain}")
+    sys_text = system_prompt_subdomain()
+    user_text = _user_transcript_block(transcript)
 
     resp = await send_chat_request(
         client=client,
@@ -181,12 +179,7 @@ async def stage_subdomain(
     raw = _as_str(get_json_field(data, "subdomain", ""))
     conf = clamp_conf(get_json_field(data, "confidence", 0.0))
 
-    allowed: List[str] = SUBDOMAINS_BY_DOMAIN_CANON.get(domain, [])
-    # If domain is "Other: ..." there is no subdomain list; default to Other for subdomain.
-    if allowed:
-    #     subdomain = other_free_text(raw, max_words=5) 
-    # else:
-        subdomain = canonical_or_other(raw, allowed_values=allowed, max_words=5)
+    subdomain = canonical_or_other(raw, allowed_values=SUBDOMAINS_CANON, max_words=5)
 
     return {"subdomain": subdomain, "confidence": conf, "_usage": usage, "_finish": finish}
 
