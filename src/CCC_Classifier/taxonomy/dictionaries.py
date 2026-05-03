@@ -30,7 +30,7 @@ EXPECTED_KEYS_ORDER: List[str] = [
 # -------------------------
 # Contact Types (canonical)
 # -------------------------
-CONTACT_TYPES_CANON: List[str] = ["Issue", "Inquiry", "Request", "Unclear Contact"]
+CONTACT_TYPES_CANON: List[str] = ["Action Requested", "Information Requested", "Unclear Contact"]
 
 # -------------------------
 # Domains (canonical)
