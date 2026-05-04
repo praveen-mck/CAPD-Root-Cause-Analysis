@@ -6,7 +6,7 @@ Pipeline orchestrator: analyze a single transcript.
 Responsibilities:
 - If no customer input (rule-based), short-circuit with "No Customer Input" outputs
 - Otherwise run stages in sequence:
-    contact_type -> domain -> subdomain -> SHORT_SUMMARY
+    contact_type -> domain -> subdomain -> issue_origin -> SHORT_SUMMARY
 - Compute overall confidence (min of stage confidences)
 - Return a single result dict
 
@@ -27,6 +27,7 @@ from CCC_Classifier.pipeline.stages import (
     stage_contact_type,
     stage_domain,
     stage_subdomain,
+    stage_issue_origin
 )
 from CCC_Classifier.utils.no_input import is_no_customer_input
 
@@ -55,6 +56,7 @@ def _no_input_result() -> Dict[str, Any]:
         "contact_type": "Unclear Contact",  # keep existing behavior
         "domain": "No Customer Input",
         "subdomain": "No Customer Input",
+        "issue_origin": "No Customer Input",
         "SHORT_SUMMARY": "Customer did not provide sufficient input to agent.",
         "DETAILED_SUMMARY": "Customer did not provide sufficient input to agent.",
         "confidence": 1.0,
@@ -73,7 +75,7 @@ async def analyze_transcript(
     """
     Analyze a single transcript and return:
       {
-        contact_type, domain, subdomain, SHORT_SUMMARY,
+        contact_type, domain, subdomain, issue_origin, SHORT_SUMMARY,
         DETAILED_SUMMARY, confidence, IS_NO_INPUT
       }
 
@@ -133,6 +135,18 @@ async def analyze_transcript(
         subdomain = sub.get("subdomain", "")
         sub_conf = sub.get("confidence", 0.0)
 
+
+        stage = "issue_origin"
+        io = await stage_issue_origin(
+            client=client,
+            deployment=deployment,
+            transcript=transcript,
+            max_completion_tokens=max_completion_tokens,
+            use_json_mode=use_json_mode,
+        )
+        issue_origin = io.get("issue_origin", "Unknown")
+        io_conf = io.get("confidence", 0.0)        
+
         stage = 'short_summary'
         ssy = await stage_SHORT_SUMMARY(
             client=client,
@@ -153,12 +167,13 @@ async def analyze_transcript(
         )
         DETAILED_SUMMARY = dsy.get("DETAILED_SUMMARY", "Context Unspecified")
 
-        overall_conf = _min_conf(ct_conf, dom_conf, sub_conf)
+        overall_conf = _min_conf(ct_conf, dom_conf, sub_conf, io_conf)
 
         return {
             "contact_type": contact_type,
             "domain": domain,
             "subdomain": subdomain,
+            "issue_origin": issue_origin,
             "SHORT_SUMMARY": SHORT_SUMMARY,
             "DETAILED_SUMMARY": DETAILED_SUMMARY,
             "confidence": overall_conf,
@@ -181,6 +196,7 @@ async def analyze_transcript(
             "contact_type": "Unclear Contact",
             "domain": "Other: Unspecified",
             "subdomain": "Other: Unspecified",
+            "issue_origin": "Other: Unspecified",
             "SHORT_SUMMARY": "Context Unspecified",
             "DETAILED_SUMMARY": "Context Unspecified",
             "confidence": 0.0,

@@ -19,7 +19,8 @@ from typing import Dict, List, Optional
 from .dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_CANON
+    SUBDOMAINS_CANON,
+    ISSUE_ORIGINS_CANON
 )
 
 # -----------------------------
@@ -84,6 +85,7 @@ def _build_nested_norm_map(d: Dict[str, List[str]]) -> Dict[str, Dict[str, str]]
 CONTACT_TYPES_MAP: Dict[str, str] = _build_norm_map(CONTACT_TYPES_CANON)
 DOMAINS_MAP: Dict[str, str] = _build_norm_map(DOMAINS_CANON)
 SUBDOMAINS_MAP: Dict[str, str] = _build_norm_map(SUBDOMAINS_CANON)
+ISSUE_ORIGINS_MAP: Dict[str, str] = _build_norm_map(ISSUE_ORIGINS_CANON)
 
 
 def canonicalize(value: str, allowed_map: Dict[str, str]) -> Optional[str]:

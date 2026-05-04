@@ -27,7 +27,8 @@ logger = logging.getLogger(__name__)
 GRADE_FIELDS: Sequence[str] = (
     "CONTACT_TYPE",
     "DOMAIN",
-    "SUBDOMAIN"
+    "SUBDOMAIN",
+    "ISSUE_ORIGIN"
 )
 
 _ALLOWED_VERDICTS = {"Correct", "Partial", "Incorrect"}
@@ -96,7 +97,7 @@ async def process_grade_batch_chats(
     Input rows require:
       - id_col (default CHAT_TRANSCRIPT_NAME)
       - text_col (default BODY)
-      - 5 predicted columns: CONTACT_TYPE, DOMAIN, SUBDOMAIN
+      - 5 predicted columns: CONTACT_TYPE, DOMAIN, SUBDOMAIN, ISSUE_ORIGIN
 
     Returns a DataFrame with columns matching the grade table schema:
       CHAT_TRANSCRIPT_NAME, GRADER_RUN_ID, GRADED_AT,
@@ -186,7 +187,7 @@ async def process_grade_batch_calls(
     Input rows require:
       - id_col (default CHAT_TRANSCRIPT_NAME)
       - text_col (default BODY)
-      - 4 predicted columns: CONTACT_TYPE, DOMAIN, SUBDOMAIN
+      - 4 predicted columns: CONTACT_TYPE, DOMAIN, SUBDOMAIN, ISSUE_ORIGIN
 
     Returns a DataFrame with columns matching the grade table schema:
       CHAT_TRANSCRIPT_NAME, GRADER_RUN_ID, GRADED_AT,

@@ -13,6 +13,7 @@ Output contract:
   "CONTACT_TYPE": {"verdict": "Correct|Partial|Incorrect", "score": 0|0.5|1, "suggested_label": str},
   "DOMAIN": {...},
   "SUBDOMAIN": {...},
+  "ISSUE_ORIGIN": {...},
   "overall_score": float
 }
 """
@@ -25,12 +26,13 @@ from typing import Any, Dict, Optional
 from CCC_Classifier.pipeline.grader.stages_grades import (
     stage_grade_contact_type,
     stage_grade_domain,
-    stage_grade_subdomain
+    stage_grade_subdomain,
+    stage_grade_issue_origin
 )
 
 logger = logging.getLogger(__name__)
 
-GRADE_FIELDS = ("CONTACT_TYPE", "DOMAIN", "SUBDOMAIN")
+GRADE_FIELDS = ("CONTACT_TYPE", "DOMAIN", "SUBDOMAIN", "ISSUE_ORIGIN")
 _ALLOWED_VERDICTS = {"Correct", "Partial", "Incorrect"}
 
 
@@ -125,11 +127,22 @@ async def analyze_predict_row(
             max_completion_tokens=max_completion_tokens,
             use_json_mode=use_json_mode,
         )
+        
+        issue = await stage_grade_issue_origin(
+            client=client,
+            deployment=deployment,
+            transcript=transcript,
+            predicted_issue_origin=str(predicted.get("ISSUE_ORIGIN") or ""),
+            predicted_domain=str(predicted.get("DOMAIN") or ""),
+            max_completion_tokens=max_completion_tokens,
+            use_json_mode=use_json_mode,
+        )
 
         out = {
             "CONTACT_TYPE": _normalize_field_grade(ct),
             "DOMAIN": _normalize_field_grade(dom),
             "SUBDOMAIN": _normalize_field_grade(sub),
+            "ISSUE_ORIGIN": _normalize_field_grade(issue),
         }
         return {**out, "overall_score": _overall_score(out)}
 

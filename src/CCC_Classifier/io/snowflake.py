@@ -263,6 +263,7 @@ def ensure_chats_results_table_exists(cfg: Dict[str, Any], *, result_db: str, re
       "CONTACT_TYPE" STRING,
       "DOMAIN" STRING,
       "SUBDOMAIN" STRING,
+      "ISSUE_ORIGIN" STRING,
       "SHORT_SUMMARY" STRING,
       "DETAILED_SUMMARY" STRING,
       "CONFIDENCE" FLOAT,
@@ -285,6 +286,7 @@ def ensure_call_results_table_exists(cfg: Dict[str, Any], *, result_db: str, res
       "CONTACT_TYPE" STRING,
       "DOMAIN" STRING,
       "SUBDOMAIN" STRING,
+      "ISSUE_ORIGIN" STRING,
       "SHORT_SUMMARY" STRING,
       "DETAILED_SUMMARY" STRING,
       "CONFIDENCE" FLOAT,
@@ -389,7 +391,7 @@ def merge_chats_results_into_table(
     Merge from stage_table into target_table using id_col.
 
     Assumes your stage dataframe uses uppercase column names as written by batch.py:
-      CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN
+      CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ISSUE_ORIGIN,
       SHORT_SUMMARY, DETAILED_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT
 
     Your scripts/main.py passes id_col="CHAT_TRANSCRIPT_NAME" (keep-as-is behavior).
@@ -405,6 +407,7 @@ def merge_chats_results_into_table(
       TGT."CONTACT_TYPE"    = SRC."CONTACT_TYPE",
       TGT."DOMAIN"          = SRC."DOMAIN",
       TGT."SUBDOMAIN"       = SRC."SUBDOMAIN",
+      TGT."ISSUE_ORIGIN"    = SRC."ISSUE_ORIGIN",
       TGT."SHORT_SUMMARY"    = SRC."SHORT_SUMMARY",
       TGT."DETAILED_SUMMARY" = SRC."DETAILED_SUMMARY",
       TGT."CONFIDENCE"      = SRC."CONFIDENCE",
@@ -413,11 +416,11 @@ def merge_chats_results_into_table(
     WHEN NOT MATCHED THEN INSERT (
       "{id_col}",
       "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN",
-      "SHORT_SUMMARY", "DETAILED_SUMMARY", "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
+      "ISSUE_ORIGIN", "SHORT_SUMMARY", "DETAILED_SUMMARY", "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
     ) VALUES (
       SRC."{id_col}",
       SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN",
-      SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY", SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
+      SRC."ISSUE_ORIGIN", SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY", SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
     );
     """
     print("[Snowflake] Merging stage -> target...\n", sql.strip())
@@ -441,6 +444,7 @@ def merge_call_results_into_table(
       TGT."CONTACT_TYPE"     = SRC."CONTACT_TYPE",
       TGT."DOMAIN"           = SRC."DOMAIN",
       TGT."SUBDOMAIN"        = SRC."SUBDOMAIN",
+      TGT."ISSUE_ORIGIN"    = SRC."ISSUE_ORIGIN",
       TGT."SHORT_SUMMARY"    = SRC."SHORT_SUMMARY",
       TGT."DETAILED_SUMMARY" = SRC."DETAILED_SUMMARY",
       TGT."CONFIDENCE"       = SRC."CONFIDENCE",
@@ -449,11 +453,11 @@ def merge_call_results_into_table(
     WHEN NOT MATCHED THEN INSERT (
       "CALL_ID",
       "CONTACT_TYPE", "DOMAIN", "SUBDOMAIN",
-      "SHORT_SUMMARY", "DETAILED_SUMMARY",
+      "ISSUE_ORIGIN", "SHORT_SUMMARY", "DETAILED_SUMMARY",
       "CONFIDENCE", "ANALYZED_AT", "IS_NO_INPUT"
     ) VALUES (
       SRC."CALL_ID",
-      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN",
+      SRC."CONTACT_TYPE", SRC."DOMAIN", SRC."SUBDOMAIN", SRC."ISSUE_ORIGIN",
       SRC."SHORT_SUMMARY", SRC."DETAILED_SUMMARY",
       SRC."CONFIDENCE", SRC."ANALYZED_AT", SRC."IS_NO_INPUT"
     );
@@ -489,7 +493,8 @@ def load_predictions_for_grading_join_source_chats(
       s."{text_col}" AS "BODY",
       p."CONTACT_TYPE",
       p."DOMAIN",
-      p."SUBDOMAIN"
+      p."SUBDOMAIN",
+      p."ISSUE_ORIGIN"
     FROM "{pred_db}"."{pred_schema}"."{pred_table}" p
     INNER JOIN "{source_db}"."{source_schema}"."{source_table}" s
       ON p."{id_col}" = s."{id_col}"
@@ -526,7 +531,8 @@ def load_predictions_for_grading_join_source_calls(
       s."{text_col}" AS "DIARIZED_TRANSCRIPT_TEXT",
       p."CONTACT_TYPE",
       p."DOMAIN",
-      p."SUBDOMAIN"
+      p."SUBDOMAIN",
+      p."ISSUE_ORIGIN"
     FROM "{pred_db}"."{pred_schema}"."{pred_table}" p
     INNER JOIN "{source_db}"."{source_schema}"."{source_table}" s
       ON p."{id_col}" = s."{id_col}"
@@ -570,6 +576,10 @@ def ensure_grades_table_exists_chats(
       "SUBDOMAIN_SCORE" FLOAT,
       "SUBDOMAIN_SUGGESTED_LABEL" STRING,
 
+      "ISSUE_ORIGIN_VERDICT" STRING,
+      "ISSUE_ORIGIN_SCORE" FLOAT,
+      "ISSUE_ORIGIN_SUGGESTED_LABEL" STRING,
+
       -- overall
       "OVERALL_SCORE" FLOAT
     );
@@ -612,6 +622,10 @@ def ensure_grades_table_exists_calls(
       "SUBDOMAIN_VERDICT" STRING,
       "SUBDOMAIN_SCORE" FLOAT,
       "SUBDOMAIN_SUGGESTED_LABEL" STRING,
+
+      "ISSUE_ORIGIN_VERDICT" STRING,
+      "ISSUE_ORIGIN_SCORE" FLOAT,
+      "ISSUE_ORIGIN_SUGGESTED_LABEL" STRING,
 
       -- overall
       "OVERALL_SCORE" FLOAT
@@ -739,6 +753,10 @@ def merge_grades_into_table_chats(
       TGT."SUBDOMAIN_SCORE" = SRC."SUBDOMAIN_SCORE",
       TGT."SUBDOMAIN_SUGGESTED_LABEL" = SRC."SUBDOMAIN_SUGGESTED_LABEL",
 
+      TGT."ISSUE_ORIGIN_VERDICT" = SRC."ISSUE_ORIGIN_VERDICT",
+      TGT."ISSUE_ORIGIN_SCORE" = SRC."ISSUE_ORIGIN_SCORE",
+      TGT."ISSUE_ORIGIN_SUGGESTED_LABEL" = SRC."ISSUE_ORIGIN_SUGGESTED_LABEL",
+
       TGT."OVERALL_SCORE" = SRC."OVERALL_SCORE"
     WHEN NOT MATCHED THEN INSERT (
       "CHAT_TRANSCRIPT_NAME",
@@ -757,6 +775,10 @@ def merge_grades_into_table_chats(
       "SUBDOMAIN_SCORE",
       "SUBDOMAIN_SUGGESTED_LABEL",
 
+      "ISSUE_ORIGIN_VERDICT",
+      "ISSUE_ORIGIN_SCORE",
+      "ISSUE_ORIGIN_SUGGESTED_LABEL",
+
       "OVERALL_SCORE"
     ) VALUES (
       SRC."CHAT_TRANSCRIPT_NAME",
@@ -774,6 +796,10 @@ def merge_grades_into_table_chats(
       SRC."SUBDOMAIN_VERDICT",
       SRC."SUBDOMAIN_SCORE",
       SRC."SUBDOMAIN_SUGGESTED_LABEL",
+
+      SRC."ISSUE_ORIGIN_VERDICT",
+      SRC."ISSUE_ORIGIN_SCORE",
+      SRC."ISSUE_ORIGIN_SUGGESTED_LABEL",
 
       SRC."OVERALL_SCORE"
     );
@@ -813,6 +839,10 @@ def merge_grades_into_table_calls(
       TGT."SUBDOMAIN_SCORE" = SRC."SUBDOMAIN_SCORE",
       TGT."SUBDOMAIN_SUGGESTED_LABEL" = SRC."SUBDOMAIN_SUGGESTED_LABEL",
 
+      TGT."ISSUE_ORIGIN_VERDICT" = SRC."ISSUE_ORIGIN_VERDICT",
+      TGT."ISSUE_ORIGIN_SCORE" = SRC."ISSUE_ORIGIN_SCORE",
+      TGT."ISSUE_ORIGIN_SUGGESTED_LABEL" = SRC."ISSUE_ORIGIN_SUGGESTED_LABEL",
+
       TGT."OVERALL_SCORE" = SRC."OVERALL_SCORE"
     WHEN NOT MATCHED THEN INSERT (
       "CALL_ID",
@@ -831,6 +861,10 @@ def merge_grades_into_table_calls(
       "SUBDOMAIN_SCORE",
       "SUBDOMAIN_SUGGESTED_LABEL",
 
+      "ISSUE_ORIGIN_VERDICT",
+      "ISSUE_ORIGIN_SCORE",
+      "ISSUE_ORIGIN_SUGGESTED_LABEL",
+
       "OVERALL_SCORE"
     ) VALUES (
       SRC."CALL_ID",
@@ -848,6 +882,10 @@ def merge_grades_into_table_calls(
       SRC."SUBDOMAIN_VERDICT",
       SRC."SUBDOMAIN_SCORE",
       SRC."SUBDOMAIN_SUGGESTED_LABEL",
+
+      SRC."ISSUE_ORIGIN_VERDICT",
+      SRC."ISSUE_ORIGIN_SCORE",
+      SRC."ISSUE_ORIGIN_SUGGESTED_LABEL",
 
       SRC."OVERALL_SCORE"
     );

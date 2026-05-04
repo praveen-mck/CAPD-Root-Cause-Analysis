@@ -8,6 +8,7 @@ Design choices (as requested):
 - Remove:
   - "Unclassified Domain"
   - "Unclassified Subdomain"
+  - "Unclassified Issue Origin"
   - "Unclassified Cause"
   - "Unclassified Driver"
 - Anything outside canonical labels should be handled as: "Other: <free text>"
@@ -22,6 +23,7 @@ EXPECTED_KEYS_ORDER: List[str] = [
     "contact_type",
     "domain",
     "subdomain",
+    "issue_origin",
     "SHORT_SUMMARY",
     "DETAILED_SUMMARY",
     "confidence",
@@ -77,4 +79,19 @@ SUBDOMAINS_CANON: List[str] = [
     "Consumables / supplies ordering",
     "General order placement assistance",
     "Escalation / supervisor follow-up",
+]
+
+# --------------------------------
+# Issue Origin (canonical)
+# --------------------------------
+ISSUE_ORIGINS_CANON: List[str] = [
+    "Transportation",
+    "Weather",
+    "Distribution Center (DC)",
+    "Supplier/Manufacturer",
+    "Carrier",
+    "Warehouse/Route",
+    "System/Portal",
+    "Customer Internet/Network",
+    "Customer"
 ]

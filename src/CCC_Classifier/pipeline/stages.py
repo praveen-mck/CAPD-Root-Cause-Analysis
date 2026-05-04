@@ -25,6 +25,7 @@ from CCC_Classifier.pipeline.prompts import (
     system_prompt_contact_type,
     system_prompt_domain,
     system_prompt_subdomain,
+    system_prompt_issue_origin,
 )
 from CCC_Classifier.taxonomy.canon import (
     canonical_domain_or_other,
@@ -35,6 +36,7 @@ from CCC_Classifier.taxonomy.canon import (
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     SUBDOMAINS_CANON,
+    ISSUE_ORIGINS_CANON,
 )
 
 
@@ -182,6 +184,46 @@ async def stage_subdomain(
     subdomain = canonical_or_other(raw, allowed_values=SUBDOMAINS_CANON, max_words=5)
 
     return {"subdomain": subdomain, "confidence": conf, "_usage": usage, "_finish": finish}
+
+async def stage_issue_origin(
+    *,
+    client: Any,
+    deployment: str,
+    transcript: str,
+    max_completion_tokens: int = 256,
+    use_json_mode: bool = True,
+) -> Dict[str, Any]:
+    """
+    Returns:
+      {
+        "issue_origin": <canonical issue origin OR Other: ...>,
+        "confidence": <0..1>,
+        "_usage": {...},
+        "_finish": "...",
+      }
+    """
+    sys_text = system_prompt_issue_origin()
+    user_text = _user_transcript_block(transcript)
+
+    resp = await send_chat_request(
+        client=client,
+        deployment=deployment,
+        system_text=sys_text,
+        user_text=user_text,
+        max_out_tokens=max_completion_tokens,
+        use_json_mode=use_json_mode,
+    )
+
+    content, usage, finish = extract_content_and_usage(resp)
+    data = safe_parse_json(content)
+
+    raw = _as_str(get_json_field(data, "issue_origin", ""))
+    conf = clamp_conf(get_json_field(data, "confidence", 0.0))
+
+    # Make issue_origin behave like subdomain: canonical or "Other: <free text>"
+    issue_origin = canonical_or_other(raw, allowed_values=ISSUE_ORIGINS_CANON, max_words=5)
+
+    return {"issue_origin": issue_origin, "confidence": conf, "_usage": usage, "_finish": finish}
 
 async def stage_SHORT_SUMMARY(
     *,

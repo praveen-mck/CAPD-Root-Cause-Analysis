@@ -29,9 +29,11 @@ from CCC_Classifier.pipeline.grader.prompts_grades import (
     system_prompt_grade_contact_type,
     system_prompt_grade_domain,
     system_prompt_grade_subdomain,
+    system_prompt_grade_issue_origin,
     user_prompt_grade_contact_type,
     user_prompt_grade_domain,
     user_prompt_grade_subdomain,
+    user_prompt_grade_issue_origin,
 )
 
 logger = logging.getLogger(__name__)
@@ -168,6 +170,34 @@ async def stage_grade_subdomain(
         transcript=transcript,
         predicted_subdomain=predicted_subdomain,
         predicted_domain=predicted_domain,
+    )
+    return await _grade_label(
+        client=client,
+        deployment=deployment,
+        system_text=system_text,
+        user_text=user_text,
+        max_completion_tokens=max_completion_tokens,
+        use_json_mode=use_json_mode,
+    )
+
+
+async def stage_grade_issue_origin(
+    *,
+    client: Any,
+    deployment: str,
+    transcript: str,
+    predicted_issue_origin: str,
+    predicted_domain: str | None = None,
+    predicted_subdomain: str | None = None,
+    max_completion_tokens: int = 220,
+    use_json_mode: bool = True,
+) -> Dict[str, Any]:
+    system_text = system_prompt_grade_issue_origin()
+    user_text = user_prompt_grade_issue_origin(
+        transcript=transcript,
+        predicted_issue_origin=predicted_issue_origin,
+        predicted_domain=predicted_domain,
+        predicted_subdomain=predicted_subdomain,
     )
     return await _grade_label(
         client=client,

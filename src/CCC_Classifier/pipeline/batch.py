@@ -60,7 +60,7 @@ async def process_batch_chats(
 
     Returns:
         DataFrame with columns:
-          CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN,
+          CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ISSUE_ORIGIN,
           SHORT_SUMMARY, DETAILED_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
           optional: _DURATION_MS
     """
@@ -96,6 +96,7 @@ async def process_batch_chats(
                     "contact_type": "Unclear Contact",
                     "domain": "Other: Unspecified",
                     "subdomain": "Other: Unspecified",
+                    "issue_origin": "Other: Unspecified",
                     "SHORT_SUMMARY": "Context Unspecified",
                     "DETAILED_SUMMARY": "Context Unspecified",
                     "confidence": 0.0,
@@ -110,6 +111,7 @@ async def process_batch_chats(
                 "CONTACT_TYPE": result.get("contact_type", "Unclear Contact"),
                 "DOMAIN": result.get("domain", "Other: Unspecified"),
                 "SUBDOMAIN": result.get("subdomain", "Other: Unspecified"),
+                "ISSUE_ORIGIN": result.get("issue_origin", "Other: Unspecified"),
                 "SHORT_SUMMARY": result.get("SHORT_SUMMARY", "Context Unspecified"),
                 "DETAILED_SUMMARY": result.get("DETAILED_SUMMARY", "Context Unspecified"),
                 "CONFIDENCE": float(result.get("confidence", 0.0) or 0.0),
@@ -156,7 +158,7 @@ async def process_batch_calls(
 
     Returns:
         DataFrame with columns:
-          CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN,
+          CHAT_TRANSCRIPT_NAME, CONTACT_TYPE, DOMAIN, SUBDOMAIN, ISSUE_ORIGIN,
           SHORT_SUMMARY, DETAILED_SUMMARY, CONFIDENCE, ANALYZED_AT, IS_NO_INPUT,
           optional: _DURATION_MS
     """
@@ -192,6 +194,7 @@ async def process_batch_calls(
                     "contact_type": "Unclear Contact",
                     "domain": "Other: Unspecified",
                     "subdomain": "Other: Unspecified",
+                    "issue_origin": "Other: Unspecified",
                     "SHORT_SUMMARY": "Context Unspecified",
                     "DETAILED_SUMMARY": "Context Unspecified",
                     "confidence": 0.0,
@@ -206,6 +209,7 @@ async def process_batch_calls(
                 "CONTACT_TYPE": result.get("contact_type", "Unclear Contact"),
                 "DOMAIN": result.get("domain", "Other: Unspecified"),
                 "SUBDOMAIN": result.get("subdomain", "Other: Unspecified"),
+                "ISSUE_ORIGIN": result.get("issue_origin", "Other: Unspecified"),
                 "SHORT_SUMMARY": result.get("SHORT_SUMMARY", "Context Unspecified"),
                 "DETAILED_SUMMARY": result.get("DETAILED_SUMMARY", "Context Unspecified"),
                 "CONFIDENCE": float(result.get("confidence", 0.0) or 0.0),

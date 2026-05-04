@@ -18,7 +18,8 @@ from typing import List
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_CANON
+    SUBDOMAINS_CANON,
+    ISSUE_ORIGINS_CANON
 )
 
 
@@ -93,7 +94,7 @@ def system_prompt_subdomain() -> str:
         "Task: Choose exactly ONE subdomain.\n"
         f"Allowed subdomains (choose ONE): [{allowed_line}].\n"
         "Rules:\n"
-        "- You MUST return a 'subdomain' that is EXACTLY one of the allowed subdomains listed above.\n"
+        "- You MUST return either (a) an allowed subdomain EXACTLY as written above, or (b) 'Other: <free text>'.\n"
         "- Do NOT paraphrase. Do NOT invent new labels.\n"
         "- If the transcript uses different wording, map it to the closest allowed subdomain.\n"
         "- Use 'Other: <free text>' ONLY if NONE of the allowed subdomains closely match the intent.\n"
@@ -101,6 +102,26 @@ def system_prompt_subdomain() -> str:
         "- Before responding, double-check: if your chosen subdomain is not an exact string match to an allowed label,\n"
         "  then pick the closest allowed label instead (unless truly no close match exists).\n"
         + _json_rule_block("subdomain")
+        + "Also include numeric key 'confidence' between 0 and 1.\n"
+    )
+
+def system_prompt_issue_origin() -> str:
+    allowed = ", ".join(ISSUE_ORIGINS_CANON)
+    return (
+        "You are an expert classifier for customer support transcripts.\n"
+        "Task: Determine where the issue originated.\n"
+        f"Choose exactly ONE issue_origin from: [{allowed}].\n"
+        "Rules:\n"
+        "- You MAY infer the most likely origin from strong contextual clues when it is not explicitly stated.\n"
+        "- If you infer (not explicitly stated), set confidence <= 0.6.\n"
+        "- If the origin is explicitly stated, confidence may be higher.\n"
+        "- Do NOT paraphrase allowed labels.\n"
+        "- Prefer the closest matching category based on context.\n"
+        "- Use 'Other: <free text>' ONLY if NONE of the allowed issue_origin labels closely match the intent.\n"
+        "- If you output 'Other:', you MUST include a short reason (2–5 words).\n"
+        "- Before responding, double-check: if your chosen issue_origin is not an exact string match to an allowed label,\n"
+        "  then pick the closest allowed label instead (unless truly no close match exists).\n"
+        + _json_rule_block("issue_origin")
         + "Also include numeric key 'confidence' between 0 and 1.\n"
     )
 
@@ -153,6 +174,3 @@ def system_prompt_DETAILED_SUMMARY() -> str:
         "}\n"
         + _json_rule_block("DETAILED_SUMMARY")
     )
-
-
-

@@ -28,7 +28,8 @@ from typing import List, Optional
 from CCC_Classifier.taxonomy.dictionaries import (
     CONTACT_TYPES_CANON,
     DOMAINS_CANON,
-    SUBDOMAINS_CANON
+    SUBDOMAINS_CANON,
+    ISSUE_ORIGINS_CANON
 )
 
 
@@ -114,8 +115,7 @@ def system_prompt_grade_contact_type() -> str:
 def system_prompt_grade_domain() -> str:
     return (
         "You are an expert evaluator grading a classifier's predicted DOMAIN.\n"
-        "Hierarchy behavior:\n"
-        "- If DOMAIN context is provided, first judge the predicted SUBDOMAIN within that DOMAIN.\n"
+        "Notes:\n"
         "- If verdict is Partial/Incorrect, you may suggest a better label from the full Allowed Labels list.\n"
         "- Use free-text only if no allowed label fits.\n"
         + _grading_rules_block()
@@ -130,6 +130,16 @@ def system_prompt_grade_subdomain() -> str:
         "- DOMAIN may be provided as additional context, but it does not restrict allowed subdomains.\n"
         "- If verdict is Partial/Incorrect, you may suggest a better label from Allowed Labels.\n"
         "- Use free-text only if no allowed label fits.\n"
+        + _grading_rules_block()
+        + _json_rule_block()
+    )
+
+def system_prompt_grade_issue_origin() -> str:
+    return (
+        "You are an expert evaluator grading a classifier's predicted ISSUE_ORIGIN.\n"
+        "Notes:\n"
+        "- Judge based on explicit evidence in the transcript.\n"
+        "- If the origin is not explicitly stated, 'Unknown' is acceptable.\n"
         + _grading_rules_block()
         + _json_rule_block()
     )
@@ -189,3 +199,24 @@ def user_prompt_grade_subdomain(
         ]
     )
     return "\n\n".join(parts)
+
+def user_prompt_grade_issue_origin(
+    *,
+    transcript: str,
+    predicted_issue_origin: str,
+    predicted_subdomain: Optional[str] = None,
+    predicted_domain: Optional[str] = None,
+) -> str:
+    parts: List[str] = []
+    if predicted_domain:
+        parts.append(f"Context DOMAIN (classifier output): {predicted_domain}")
+    if predicted_subdomain:
+        parts.append(f"Context SUBDOMAIN (classifier output): {predicted_subdomain}")
+    parts.extend(
+        [
+            f"Predicted ISSUE_ORIGIN: {predicted_issue_origin}",
+            _allowed_block("Allowed ISSUE_ORIGIN labels", ISSUE_ORIGINS_CANON),
+            _transcript_block(transcript),
+        ]
+    )
+    return "\n\n".join(parts) 
